@@ -2,7 +2,7 @@ from UI import UI
 import pygame, sys
 from pygame.locals import *
 import random
-
+'''
 #generate 10 nodes at random xy's
 nodes = list()
 for x in range(0,10):
@@ -10,7 +10,10 @@ for x in range(0,10):
 
 #print their coordinates
 print(*nodes,sep='\n')
-x = UI(nodes)
+'''
+board = BoardManager(1000, 1000, {})
+ui = UI(board.p1Node, board.p2Node)
+
 
 #gameloop
 while(True):
@@ -20,4 +23,6 @@ while(True):
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+        if board.newBoardState:
+        	ui.updateBoard(board.p1Node, board.p2Node)
 
