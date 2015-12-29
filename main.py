@@ -1,3 +1,4 @@
+from BoardManager import BoardManager
 from UI import UI
 import pygame, sys
 from pygame.locals import *

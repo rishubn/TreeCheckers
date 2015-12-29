@@ -13,11 +13,11 @@ class Node:
      
     '''
     def addChild(self, child):
-        children[child.id] = child
+        self.children[child.id] = child
 
     ''' Gets the child of thise node with the matching id. 
         If there is no such child this will return None
     '''
     def getChild(self, id):
-        return children.get(id)
+        return self.children.get(id)
         
