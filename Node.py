@@ -27,3 +27,7 @@ class Node:
     def getChild(self, id):
         return self.children.get(id)
         
+    def __eq__(self, other):
+        return self.id == other.id and self.x == other.x and self.y == other.y
+    def __ne__(self, other):
+        return self.id != other.id or  self.x != other.x or  self.y != other.y
