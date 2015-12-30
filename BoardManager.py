@@ -6,7 +6,7 @@ class BoardManager:
     boardSizeY = None
     p1Node = None
     p2Node = None
-    next_id = -1
+    _next_id = -1
 
     #flags
     newBoardState = False
@@ -36,9 +36,10 @@ class BoardManager:
     def buildTree(self,playerNum, x, y, ymin, ymax, depth, numChildren):
         output = Node(x, y, self.getNextId())
 
+        print (depth,",",numChildren)
+
         #return a childless node if depth is 0. Else, start making the children
-        if depth != 0:
-            
+        if depth > 0:
             for i in range (numChildren):
                 #x is current x plus half the distance between x and the center line. 
                 #y is i out of (numChildren + 1) portions of the way down the part of the board allotted to this node. 
@@ -88,8 +89,8 @@ class BoardManager:
 
 
     def getNextId(self):
-        self.next_id += 1
-        return self.next_id
+        self._next_id += 1
+        return self._next_id
 
     # Once we get support for different distance metrics, this function should compute the appropraite one based on distanceMetric
     def getDistance(self,x1, y1, x2, y2):

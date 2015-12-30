@@ -21,7 +21,10 @@ class UI:
         pygame.display.update()  #draw the empty window
         
     def drawCircles(self):
+        self.printed = set()
+        self.printed.add(self.p1Node)
         self.drawTeamCircles(self.p1Node)
+        self.printed.add(self.p2Node)
         self.drawTeamCircles(self.p2Node)        
 
     """
@@ -31,7 +34,9 @@ class UI:
         pygame.draw.circle(self.windowSurface, self.BLUE, (math.floor(root.x), math.floor(root.y)),20,0)
         pygame.display.update() #perhaps update should just be called once, at the end of this method? -Forrest Dec 29 2015
         for childID in root.children:
-            self.drawTeamCircles(root.getChild(childID))
+            if childID not in self.printed:
+                self.printed.add(childID)
+                self.drawTeamCircles(root.getChild(childID))
 
     def updateBoard(self, p1New, p2New):
         #play animations and whatnot as approprate
