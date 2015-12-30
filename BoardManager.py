@@ -63,9 +63,9 @@ class BoardManager:
     def makeMove(self,pnum, id, newX, newY):
         result = False
         if pnum == 1:
-            actingNode = self.getNode(p1Node, id)
+            actingNode = self.getNode(self.p1Node, id)
         else:
-            actingNode = self.getNode(p2Node, id)
+            actingNode = self.getNode(self.p2Node, id)
 
         if self.getDistance(actingNode.x, actingNode.y, newX, newY) <= self.maxDistance:
             actingNode.x = newX
