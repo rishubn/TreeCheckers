@@ -13,7 +13,13 @@ class Node:
      
     '''
     def addChild(self, child):
-        self.children[child.id] = child
+        try:
+            self.children[child.id] = child
+        except AttributeError:
+            raise TypeError('''
+                            the addChild function requires an object with an attribute named 
+                            'id', but it was passed an object of type {0} which has no 'id' attribute.
+                            '''.format(type(child)))
 
     ''' Gets the child of thise node with the matching id. 
         If there is no such child this will return None

@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, sys, math
 from pygame.locals import *
 
 class UI:
@@ -21,16 +21,24 @@ class UI:
         pygame.display.update()  #draw the empty window
         
     def drawCircles(self):
-        for x in range(0,len(self.nodes)):   #draw the nodes and update after each one
-            pygame.draw.circle(self.windowSurface, (255,0,0), self.nodes[x],20,0)
-            pygame.display.update()
+        self.drawTeamCircles(self.p1Node)
+        self.drawTeamCircles(self.p2Node)        
+
+    """
+    Draws all the circles below the given Node. If the given node is the root of a team, this function will draw every node on that team.
+    """
+    def drawTeamCircles(self, root):
+        pygame.draw.circle(self.windowSurface, self.BLUE, (math.floor(root.x), math.floor(root.y)),20,0)
+        pygame.display.update() #perhaps update should just be called once, at the end of this method? -Forrest Dec 29 2015
+        for childID in root.children:
+            self.drawTeamCircles(root.getChild(childID))
 
     def updateBoard(self, p1New, p2New):
         #play animations and whatnot as approprate
 
         #set new board
-        p1Node = p1New
-        p2Node = p2New
+        self.p1Node = p1New
+        self.p2Node = p2New
 
 
             

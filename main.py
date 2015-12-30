@@ -3,7 +3,7 @@ from UI import UI
 import pygame, sys
 from pygame.locals import *
 import random
-'''
+"""
 #generate 10 nodes at random xy's
 nodes = list()
 for x in range(0,10):
@@ -11,14 +11,14 @@ for x in range(0,10):
 
 #print their coordinates
 print(*nodes,sep='\n')
-'''
-board = BoardManager(1000, 1000, {})
+"""
+board = BoardManager(1000, 1000, {'startDepth':2})
 ui = UI(board.p1Node, board.p2Node)
 
 
 #gameloop
 while(True):
-    x.drawCircles()
+    ui.drawCircles()
     while True:  #quit event handler
         for event in pygame.event.get():
             if event.type == QUIT:
