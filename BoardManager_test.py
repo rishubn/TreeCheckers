@@ -38,7 +38,7 @@ def testMakeMoveValid():
 	assert bm.makeMove(1, 0, 1 + bm.p1Node.x, 1 + bm.p1Node.y) #should return true because it was a valid move
 def testMakeMoveInvalidInBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
-	assert not bm.makeMove(1, 0, 25 + bm.p1Node.x, 25 + bm.p1Node.y) #should return false because it was an invalid move because it was too far
+	assert not bm.makeMove(1, bm.p1Node.id, 25 + bm.p1Node.x, 25 + bm.p1Node.y) #should return false because it was an invalid move because it was too far
 def testmakeMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
 	bm.p1Node.x = 1

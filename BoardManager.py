@@ -32,6 +32,8 @@ class BoardManager:
         #build board
         self.p1Node = self.buildTree(1, self.boardSizeX / 8, self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
         self.p2Node = self.buildTree(2, self.boardSizeX - (self.boardSizeX / 8), self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
+
+        self.checked = set() #done to prevent buggy trees from causing infinite recursion. should be temporary
     
     def buildTree(self,playerNum, x, y, ymin, ymax, depth, numChildren):
         output = Node(x, y, self.getNextId())
@@ -70,6 +72,7 @@ class BoardManager:
     '''
     def makeMove(self,pnum, id, newX, newY):
         result = False
+        self.checked = set()
         if pnum == 1:
             actingNode = self.getNode(self.p1Node, id)
         else:
@@ -90,20 +93,22 @@ class BoardManager:
       if the move is valid, updates the board and sets the newBoardState flag to True
     '''
     def makeMove(self,pnum, id, newX, newY):
+        self.checked = set()
         if pnum == 1:
             actingNode = self.getNode(self.p1Node, id)
         else:
             actingNode = self.getNode(self.p2Node, id)
 
-        result = isValidMove(pnum, id, newX, newY)
+        result = self.isValidMove(pnum, id, newX, newY)
         if result:
-            _applyMove(actingNode, newX, newY)
+            self._applyMove(actingNode, newX, newY)
         return result
 
     '''
     Takes a node, and where it might be moved to, and checks if the move is valid. Returns True if it is, False otherwise
     '''
     def isValidMove(self, pnum, id, newX, newY):
+        self.checked = set()
         if pnum == 1:
             actingNode = self.getNode(self.p1Node, id)
         else:
@@ -124,15 +129,20 @@ class BoardManager:
 
         self.newBoardState = True
 
-    def getNode(self,root, id):
-        if root.getChild(id) is not None:
-            return root.getChild(id)
+    """
+    using checked to prevent infinite recursion here is necessary becuase buildTree is wrong, not because getNode is wrong (we think)
+    """
+    def getNode(self,root, id, default = None):
+        if root.id == id:
+            return root
         elif root.children is not None:
             for childID in root.children:
-                output = self.getNode(root.getChild(childID), id)
-                if output is not None:
-                    return output
-        return None
+                if childID not in self.checked:
+                    self.checked.add(childID)
+                    output = self.getNode(root.getChild(childID), id)
+                    if output is not None:
+                        return output
+        return default
 
     def getNextId(self):
         self._next_id += 1
