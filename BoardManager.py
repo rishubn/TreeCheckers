@@ -55,7 +55,15 @@ class BoardManager:
                                                 depth - 1, 
                                                 numChildren))
         return output
-
+    
+    #this code is from before a refactoring effort. It has since turned into three functions, 
+    #isValidMove,
+    #_applyMove, and
+    #makeMove, 
+    #to provide error checking functionality to someone who is considering making a move but hasn't decided yet. 
+    #If everything is working fine with the running version of makeMove you can just delete all this stuff. 
+    #commented on 1/1/2016 
+    """
     ''' Takes the id of the node being moved, its new x location and its new y location
       returns True if the move was valid and False if it was invalid. 
       if the move is valid, updates the board and sets the newBoardState flag to True
@@ -76,6 +84,41 @@ class BoardManager:
             self.newBoardState = True
 
         return result
+    """
+    ''' Takes the id of the node being moved, its new x location and its new y location
+      returns True if the move was valid and False if it was invalid. 
+      if the move is valid, updates the board and sets the newBoardState flag to True
+    '''
+    def makeMove(self,pnum, id, newX, newY):
+        if pnum == 1:
+            actingNode = self.getNode(self.p1Node, id)
+        else:
+            actingNode = self.getNode(self.p2Node, id)
+
+        result = isValidMove(pnum, id, newX, newY)
+        if result:
+            _applyMove(actingNode, newX, newY)
+        return result
+
+    '''
+    Takes a node, and where it might be moved to, and checks if the move is valid. Returns True if it is, False otherwise
+    '''
+    def isValidMove(self, pnum, id, newX, newY):
+        if pnum == 1:
+            actingNode = self.getNode(self.p1Node, id)
+        else:
+            actingNode = self.getNode(self.p2Node, id)
+        return self.getDistance(actingNode.x, actingNode.y, newX, newY) <= self.maxDistance
+
+    '''
+    Takes a node and moves it. Also informs everyone that the board has changed. there is absolutely no error checking here, so only use this if you've done your error checking!
+    If you want to make a move with error checking (i.e. only make the move if it's valid) use the makeMove function. 
+    '''
+    def _applyMove(self, actingNode, newX, newY):
+        actingNode.x = newX
+        actingNode.y = newY
+
+        self.newBoardState = True
 
     def getNode(self,root, id):
         if root.getChild(id) is not None:
@@ -86,7 +129,6 @@ class BoardManager:
                 if output is not None:
                     return output
         return None
-
 
     def getNextId(self):
         self._next_id += 1

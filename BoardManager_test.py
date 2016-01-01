@@ -24,7 +24,6 @@ def testGetNodeDistanceEuclidean():
 
 #test the getNode function
 def testGetNode():
-
 	bm = BoardManager(1000, 1000, {})
 	n0 = Node(0, 0, 0)
 	n1 = Node(1, 1, 1)
@@ -45,8 +44,26 @@ def testmakeMoveInvalidOutOfBounds():
 	bm.p1Node.x = 1
 	assert not bm.makeMove(1, 0, -2 + bm.p1Node.x, bm.p1Node.y) #should return false because it was an invalid move becuase it went outside the playing area
 
+#test the _applyMove function
+def test_ApplyMove():
+	bm = BoardManager(1000, 1000, {'startDepth':0})
+	bm._applyMove(bm.p1Node, -1, -2) #wouldn't be allowed if there was error checking
+	assert bm.p1Node.x == -1 and bm.p1Node.y == -2
+
+#test the isValidMove function
+def testIsValidMoveValid():
+	bm = BoardManager(1000, 1000, {'startDepth':0})
+	assert isValidMove(bm.p2Node, bm.p2Node.x + 1, bm.p2Node.y + 1)
+def testIsValidMoveInvalidTooFar():
+	bm = BoardManager(1000, 1000, {'startDepth':0})
+	assert not isValidMove(bm.p2Node, bm.p2Node.x + 10000, bm.p2Node.y + 10000)
+def testIsValidMoveInvalidOutOfBounds():
+	bm = BoardManager(1000, 1000, {'startDepth':0})
+	assert not isValidMove(bm.p1Node, -100, bm.p1Node.y)
+
+
 #test the buildTree function
-#could really use some more tests
+#could really use some more tests, especially of correct placement of children, both in the tree and on the board
 def testBuildTreeDepth0p1Node():
 	bm = BoardManager(1000, 1000, {'startDepth':0})
 	assert bm.p1Node == Node(bm.boardSizeX / 8, bm.boardSizeY / 2, 0, {})
