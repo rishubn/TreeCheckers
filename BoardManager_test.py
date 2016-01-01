@@ -53,13 +53,13 @@ def test_ApplyMove():
 #test the isValidMove function
 def testIsValidMoveValid():
 	bm = BoardManager(1000, 1000, {'startDepth':0})
-	assert isValidMove(bm.p2Node, bm.p2Node.x + 1, bm.p2Node.y + 1)
+	assert bm.isValidMove(2, bm.p2Node.id, bm.p2Node.x + 1, bm.p2Node.y + 1)
 def testIsValidMoveInvalidTooFar():
 	bm = BoardManager(1000, 1000, {'startDepth':0})
-	assert not isValidMove(bm.p2Node, bm.p2Node.x + 10000, bm.p2Node.y + 10000)
+	assert not bm.isValidMove(2, bm.p2Node.id, bm.p2Node.x + 10000, bm.p2Node.y + 10000)
 def testIsValidMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':0})
-	assert not isValidMove(bm.p1Node, -100, bm.p1Node.y)
+	assert not bm.isValidMove(1, bm.p1Node.id, -100, bm.p1Node.y)
 
 
 #test the buildTree function

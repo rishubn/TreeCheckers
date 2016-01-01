@@ -108,7 +108,11 @@ class BoardManager:
             actingNode = self.getNode(self.p1Node, id)
         else:
             actingNode = self.getNode(self.p2Node, id)
-        return self.getDistance(actingNode.x, actingNode.y, newX, newY) <= self.maxDistance
+        return (newX >= 0 and 
+                newY >= 0 and 
+                newX <= self.boardSizeX and 
+                newY <= self.boardSizeY and 
+                self.getDistance(actingNode.x, actingNode.y, newX, newY) <= self.maxDistance)
 
     '''
     Takes a node and moves it. Also informs everyone that the board has changed. there is absolutely no error checking here, so only use this if you've done your error checking!
