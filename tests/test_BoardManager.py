@@ -1,6 +1,6 @@
 import pytest, math
-from Node import Node
-from BoardManager import BoardManager
+from backend.Node import Node
+from backend.BoardManager import BoardManager
 
 #this is a helper function for comparing two floating point numbers. 
 #probably already exists somewhere but it's so simple we just rewrote it here
