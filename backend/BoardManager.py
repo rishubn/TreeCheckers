@@ -1,5 +1,5 @@
 import math
-from Node import Node
+from backend.Node import Node
 
 class BoardManager:
     boardSizeX = None
