@@ -19,6 +19,7 @@ class BoardManager:
     ''' for best results, boardSizeX and boardSizeY should be positive integers, and configs should be a dictionary
       __init__ will use default values if configs does not contain necessary information
     '''
+    #TODO remove checked from everywhere
     def __init__(self, boardSizeX, boardSizeY, configs = {}):
         self.boardSizeX = boardSizeX
         self.boardSizeY = boardSizeY
@@ -30,34 +31,26 @@ class BoardManager:
         self.depth = configs.get('startDepth', 3)
 
         #build board
-        self.p1Node = self.buildTree(1, self.boardSizeX / 8, self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
-        self.p2Node = self.buildTree(2, self.boardSizeX - (self.boardSizeX / 8), self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
+#        self.p1Node = self.buildTree(1, self.boardSizeX / 8, self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
+ #       self.p2Node = self.buildTree(2, self.boardSizeX - (self.boardSizeX / 8), self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
 
         self.checked = set() #done to prevent buggy trees from causing infinite recursion. should be temporary
     
-    def buildTree(self,playerNum, x, y, ymin, ymax, depth, numChildren):
-        output = Node(x, y, self.getNextId())
-
-        print (depth,",",numChildren)
-
-        #return a childless node if depth is 0. Else, start making the children
+    #@FCC Jan 4 2016
+    #Recursively builds tree, IDs in preorder
+    def buildTree(self,depth, numChildren, lastid):
+        children = {}
         if depth > 0:
-            for i in range (numChildren):
-                #x is current x plus half the distance between x and the center line. 
-                #y is i out of (numChildren + 1) portions of the way down the part of the board allotted to this node. 
-                #if you find this confusing ask Forrest about it
-                dx = (abs(x - self.boardSizeX / 2) / 2)
-                if playerNum == 2:  #if the player is on the right
-                    dx *= -1
-                output.addChild(self.buildTree(playerNum, 
-                                                x + dx, 
-                                                (((float)(i * ymax))/(numChildren + 1)) + ymin, 
-                                                (i/numChildren) * ymax, 
-                                                ((i+1)/numChildren) * ymax, 
-                                                depth - 1, 
-                                                numChildren))
-        return output
-    
+            for i in range(0,numChildren):
+                thisid = self.getNextId()
+                children[thisid] = self.buildTree(depth-1,numChildren,thisid)
+        return Node(None,None,lastid,children)
+
+
+
+
+
+
     #this code is from before a refactoring effort. It has since turned into three functions, 
     #isValidMove,
     #_applyMove, and
