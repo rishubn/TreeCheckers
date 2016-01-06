@@ -63,3 +63,15 @@ def testBuildTreeDepth0p2Node():
 def testBuildTreeDepth1():
 	bm = BoardManager(1000, 1000, {'startDepth':1, 'numChildren':2})
 	assert len(bm.p1Node.children) == 2 and len(bm.p2Node.children) == 2
+
+def testSetIndexValidIndex():
+    import random
+    rand_depth = random.randint(1,5)
+    rand_children = random.randint(1,10)
+    bm = BoardManager(1000,1000, {'startDepth':rand_depth, 'numChildren':rand_children})
+    tree = bm.buildTree(rand_depth,rand_children,bm.getNextId())
+    bm.setIndexes(tree,rand_children)
+    for ids, positions in bm.positionMap.items():
+        assert positions[1] != -1 
+
+

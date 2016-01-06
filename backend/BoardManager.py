@@ -59,16 +59,16 @@ class BoardManager:
     # TODO write tests for this method
     def setIndexes(self,root,numChildren,parentindex=None):
         if root:
-            if self.positionMap[root.id][0] == 0 and self.positionMap[root.id][1] == -1:
+            if self.positionMap[root.ID][0] == 0 and self.positionMap[root.ID][1] == -1:
                 parentindex = 1
-                self.positionMap[root.id][1] = parentindex
+                self.positionMap[root.ID][1] = parentindex
             i = numChildren-1
             for ids,child in root.children.items():
                 index = parentindex * numChildren - i
-                self.positionMap[child.id][1] = index
+                self.positionMap[child.ID][1] = index
                 i = i - 1
             for ids,child in root.children.items():
-                self.setIndexes(child,numChildren,self.positionMap[child.id][1])
+                self.setIndexes(child,numChildren,self.positionMap[child.ID][1])
     
     # @RN Jan 5 2016
     # maps positionMap to X and Ys relative to the board size for N children in a tree
