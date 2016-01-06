@@ -1,0 +1,12 @@
+language: python
+python:
+    - "3.4"
+before_install:
+    - sudo apt-get install mercurial python3-dev python3-numpy libav-tools libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev libsmpeg-dev libsdl1.2-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev
+    - hg clone https://bitbucket.org/pygame/pygame
+    - python3 setup.py build
+    - python3 setup.py install
+install:
+    - pip install -r .travis_requirements.txt
+virtualenv:
+    system_site_packages: true
