@@ -17,7 +17,7 @@ class BoardManager:
     
     #config settings
     maxDistance = -1
-    distanceMetric = 'euclidean'
+    distanceMetric = ''
     numChildren = -1
 
     ''' for best results, boardSizeX and boardSizeY should be positive integers, and configs should be a dictionary
@@ -30,15 +30,14 @@ class BoardManager:
         
         #interpret configs dict
         self.maxDistance = configs.get('maxDistance', 25)
-        self.distanceMetric = configs.get('distanceMetric', 'euclidean')
-        self.numChildren = configs.get('numChildren', 3)        
-        self.depth = configs.get('startDepth', 3)
+        self.distanceMetric = configs.get('distanceMetric', 'euclidean').lower()
+        self.numChildren = int(configs.get('numChildren', 3))        
+        self.depth = int(configs.get('startDepth', 3))
 
         #build board
 #        self.p1Node = self.buildTree(1, self.boardSizeX / 8, self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
  #       self.p2Node = self.buildTree(2, self.boardSizeX - (self.boardSizeX / 8), self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
 
-        self.checked = set() #done to prevent buggy trees from causing infinite recursion. should be temporary
     
     # @FCC Jan 4 2016
     # Recursively builds tree, IDs in preorder
@@ -97,7 +96,6 @@ class BoardManager:
     '''
     def makeMove(self,pnum, id, newX, newY):
         result = False
-        self.checked = set()
         if pnum == 1:
             actingNode = self.getNode(self.p1Node, id)
         else:
@@ -118,7 +116,6 @@ class BoardManager:
       if the move is valid, updates the board and sets the newBoardState flag to True
     '''
     def makeMove(self,pnum, id, newX, newY):
-        self.checked = set()
         if pnum == 1:
             actingNode = self.getNode(self.p1Node, id)
         else:
@@ -133,7 +130,6 @@ class BoardManager:
     Takes a node, and where it might be moved to, and checks if the move is valid. Returns True if it is, False otherwise
     '''
     def isValidMove(self, pnum, id, newX, newY):
-        self.checked = set()
         if pnum == 1:
             actingNode = self.getNode(self.p1Node, id)
         else:
@@ -162,11 +158,9 @@ class BoardManager:
             return root
         elif root.children is not None:
             for childID in root.children:
-                if childID not in self.checked:
-                    self.checked.add(childID)
-                    output = self.getNode(root.getChild(childID), id)
-                    if output is not None:
-                        return output
+                output = self.getNode(root.getChild(childID), id)
+                if output is not None:
+                    return output
         return default
 
     def getNextId(self):
