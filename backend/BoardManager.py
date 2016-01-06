@@ -11,7 +11,7 @@ class BoardManager:
     #TODO to be moved to tree class
     #maps node ID to depth and index array
     positionMap = {}
-    xyMap = {} #TODO rename this to something better
+    #xyMap = {} #TODO rename this to something better
     #flags
     newBoardState = False
     
@@ -73,13 +73,17 @@ class BoardManager:
     # @RN Jan 5 2016
     # maps positionMap to X and Ys relative to the board size for N children in a tree
     # ask Rishub for more info
-    def mapXY(self, numChildren):
+    def mapXY(self, root, numChildren):
         for ids, positions in self.positionMap.items():
             depth = positions[0]
             index = positions[1]
             x = index * self.boardSizeX / (2 ** depth + numChildren - 1)
             y = depth * self.boardSizeY / self.depth
-            self.xyMap[ids] = [x,y]
+            
+            actingNode = root.getNode(ids)
+            actingNode.x = x
+            actingNode.y = y
+            #self.xyMap[ids] = [x,y]
             
     
     # this code is from before a refactoring effort. It has since turned into three functions, 

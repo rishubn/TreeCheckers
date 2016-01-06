@@ -1,5 +1,5 @@
-from BoardManager import BoardManager
-from UI import UI
+from backend.BoardManager import BoardManager
+from UI.UI import UI
 import pygame, sys
 from pygame.locals import *
 import random
