@@ -7,7 +7,11 @@ class BoardManager:
     p1Node = None
     p2Node = None
     _next_id = -1
-
+    
+    #TODO to be moved to tree class
+    #maps node ID to depth and index array
+    positionMap = {}
+    xyMap = {} #TODO rename this to something better
     #flags
     newBoardState = False
     
@@ -36,28 +40,56 @@ class BoardManager:
 
         self.checked = set() #done to prevent buggy trees from causing infinite recursion. should be temporary
     
-    #@FCC Jan 4 2016
-    #Recursively builds tree, IDs in preorder
+    # @FCC Jan 4 2016
+    # Recursively builds tree, IDs in preorder
     def buildTree(self,depth, numChildren, lastid):
         children = {}
         if depth > 0:
             for i in range(0,numChildren):
                 thisid = self.getNextId()
                 children[thisid] = self.buildTree(depth-1,numChildren,thisid)
+        self.positionMap[lastid] = [self.depth-depth,-1]
         return Node(None,None,lastid,children)
 
-
-
-
-
-
-    #this code is from before a refactoring effort. It has since turned into three functions, 
-    #isValidMove,
-    #_applyMove, and
-    #makeMove, 
-    #to provide error checking functionality to someone who is considering making a move but hasn't decided yet. 
-    #If everything is working fine with the running version of makeMove you can just delete all this stuff. 
-    #commented on 1/1/2016 
+    # @RN Jan 5 2016
+    # Recursively sets serial indexes into positionMap for tree with N children
+    # index = parentindex * numchildren - lateral position in tree
+    # split into two loops, one to set indexes of a nodes children, the second to traverse the tree
+    # Ask Rishub for more information if confused
+    # TODO to be refactored into Tree Class
+    # TODO write tests for this method
+    def setIndexes(self,root,numChildren,parentindex=None):
+        if root:
+            if self.positionMap[root.id][0] == 0 and self.positionMap[root.id][1] == -1:
+                parentindex = 1
+                self.positionMap[root.id][1] = parentindex
+            i = numChildren-1
+            for ids,child in root.children.items():
+                index = parentindex * numChildren - i
+                self.positionMap[child.id][1] = index
+                i = i - 1
+            for ids,child in root.children.items():
+                self.setIndexes(child,numChildren,self.positionMap[child.id][1])
+    
+    # @RN Jan 5 2016
+    # maps positionMap to X and Ys relative to the board size for N children in a tree
+    # ask Rishub for more info
+    def mapXY(self, numChildren):
+        for ids, positions in self.positionMap.items():
+            depth = positions[0]
+            index = positions[1]
+            x = index * self.boardSizeX / (2 ** depth + numChildren - 1)
+            y = depth * self.boardSizeY / self.depth
+            self.xyMap[ids] = [x,y]
+            
+    
+    # this code is from before a refactoring effort. It has since turned into three functions, 
+    # isValidMove,
+    # _applyMove, and
+    # makeMove, 
+    # to provide error checking functionality to someone who is considering making a move but hasn't decided yet. 
+    # If everything is working fine with the running version of makeMove you can just delete all this stuff. 
+    # commented on 1/1/2016 
     """
     ''' Takes the id of the node being moved, its new x location and its new y location
       returns True if the move was valid and False if it was invalid. 
