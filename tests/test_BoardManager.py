@@ -22,23 +22,13 @@ def testGetNodeDistanceEuclidean():
 	n1 = Node(1, 1, 1)
 	assert tolerantEquals(bm.getNodeDistance(n0, n1), math.sqrt(2), 0.001)
 
-#test the getNode function
-def testGetNode():
-	bm = BoardManager(1000, 1000, {})
-	n0 = Node(0, 0, 0)
-	n1 = Node(1, 1, 1)
-	n2 = Node(2, 2, 2)
-	n0.addChild(n1)
-	n1.addChild(n2)
-	assert bm.getNode(n0, 2) == n2
-
 #test the makeMove function
 def testMakeMoveValid():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
 	assert bm.makeMove(1, 0, 1 + bm.p1Node.x, 1 + bm.p1Node.y) #should return true because it was a valid move
 def testMakeMoveInvalidInBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
-	assert not bm.makeMove(1, bm.p1Node.id, 25 + bm.p1Node.x, 25 + bm.p1Node.y) #should return false because it was an invalid move because it was too far
+	assert not bm.makeMove(1, bm.p1Node.ID, 25 + bm.p1Node.x, 25 + bm.p1Node.y) #should return false because it was an invalid move because it was too far
 def testmakeMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
 	bm.p1Node.x = 1
@@ -53,13 +43,13 @@ def test_ApplyMove():
 #test the isValidMove function
 def testIsValidMoveValid():
 	bm = BoardManager(1000, 1000, {'startDepth':0})
-	assert bm.isValidMove(2, bm.p2Node.id, bm.p2Node.x + 1, bm.p2Node.y + 1)
+	assert bm.isValidMove(2, bm.p2Node.ID, bm.p2Node.x + 1, bm.p2Node.y + 1)
 def testIsValidMoveInvalidTooFar():
 	bm = BoardManager(1000, 1000, {'startDepth':0})
-	assert not bm.isValidMove(2, bm.p2Node.id, bm.p2Node.x + 10000, bm.p2Node.y + 10000)
+	assert not bm.isValidMove(2, bm.p2Node.ID, bm.p2Node.x + 10000, bm.p2Node.y + 10000)
 def testIsValidMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':0})
-	assert not bm.isValidMove(1, bm.p1Node.id, -100, bm.p1Node.y)
+	assert not bm.isValidMove(1, bm.p1Node.ID, -100, bm.p1Node.y)
 
 
 #test the buildTree function

@@ -150,19 +150,6 @@ class BoardManager:
 
         self.newBoardState = True
 
-    """
-    using checked to prevent infinite recursion here is necessary becuase buildTree is wrong, not because getNode is wrong (we think)
-    """
-    def getNode(self,root, id, default = None):
-        if root.id == id:
-            return root
-        elif root.children is not None:
-            for childID in root.children:
-                output = self.getNode(root.getChild(childID), id)
-                if output is not None:
-                    return output
-        return default
-
     def getNextId(self):
         self._next_id += 1
         return self._next_id

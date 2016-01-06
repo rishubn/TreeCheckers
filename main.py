@@ -12,17 +12,17 @@ def debugPrintBoardInfo(bm):
 		   "--------------------\n"+
 		   "--------------------\n"+
 		   "Player 1:\n")
-	printed.add(bm.p1Node.id)
+	printed.add(bm.p1Node.ID)
 	debugPrintHelper("", bm.p1Node)
 	print ("--------------------\n"+
 		   "--------------------\n"+
 		   "--------------------\n"+
 		   "Player 2:\n")
-	printed.add(bm.p2Node.id)
+	printed.add(bm.p2Node.ID)
 	debugPrintHelper("", bm.p2Node)
 
 def debugPrintHelper(formatString, root):
-	print("{0}ID: {1}\n{0}x: {2}\n{0}y: {3}\n".format(formatString, root.id, root.x, root.y))
+	print("{0}ID: {1}\n{0}x: {2}\n{0}y: {3}\n".format(formatString, root.ID, root.x, root.y))
 	for childID in root.children:
 		if childID not in printed:
 			printed.add(childID)
