@@ -11,7 +11,6 @@ class BoardManager:
     #TODO to be moved to tree class
     #maps node ID to depth and index array
     positionMap = {}
-    #xyMap = {} #TODO rename this to something better
     #flags
     newBoardState = False
     
@@ -19,6 +18,7 @@ class BoardManager:
     maxDistance = -1
     distanceMetric = ''
     numChildren = -1
+    depth = -1
 
     ''' for best results, boardSizeX and boardSizeY should be positive integers, and configs should be a dictionary
       __init__ will use default values if configs does not contain necessary information
@@ -33,11 +33,19 @@ class BoardManager:
         self.distanceMetric = configs.get('distanceMetric', 'euclidean').lower()
         self.numChildren = int(configs.get('numChildren', 3))        
         self.depth = int(configs.get('startDepth', 3))
+        if self.depth < 1:
+            self.depth = 1
 
-        #build board
-#        self.p1Node = self.buildTree(1, self.boardSizeX / 8, self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
- #       self.p2Node = self.buildTree(2, self.boardSizeX - (self.boardSizeX / 8), self.boardSizeY / 2, 0, self.boardSizeY, self.depth, self.numChildren)
-
+        #build board for player 1
+        self.positionMap = {} #must be before buildTree is called
+        self.p1Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
+        self.setIndexes(self.p1Node, self.numChildren)
+        self.mapXY(self.p1Node, self.numChildren)
+        #build board for player 2
+        self.positionMap = {} #must be before buildTree is called
+        self.p2Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
+        self.setIndexes(self.p2Node, self.numChildren)
+        self.mapXY(self.p2Node, self.numChildren)
     
     # @FCC Jan 4 2016
     # Recursively builds tree, IDs in preorder
@@ -55,7 +63,6 @@ class BoardManager:
     # index = parentindex * numchildren - lateral position in tree
     # split into two loops, one to set indexes of a nodes children, the second to traverse the tree
     # Ask Rishub for more information if confused
-    # TODO to be refactored into Tree Class
     # TODO write tests for this method
     def setIndexes(self,root,numChildren,parentindex=None):
         if root:
@@ -82,9 +89,7 @@ class BoardManager:
             
             actingNode = root.getNode(ids)
             actingNode.x = x
-            actingNode.y = y
-            #self.xyMap[ids] = [x,y]
-            
+            actingNode.y = y            
     
     # this code is from before a refactoring effort. It has since turned into three functions, 
     # isValidMove,
@@ -119,13 +124,15 @@ class BoardManager:
       returns True if the move was valid and False if it was invalid. 
       if the move is valid, updates the board and sets the newBoardState flag to True
     '''
-    def makeMove(self,pnum, id, newX, newY):
+    def makeMove(self,pnum, nodeId, newX, newY):
         if pnum == 1:
-            actingNode = self.getNode(self.p1Node, id)
+            #actingNode = self.getNode(self.p1Node, nodeId)
+            actingNode = self.p1Node.getNode(nodeId)
         else:
-            actingNode = self.getNode(self.p2Node, id)
+            #actingNode = self.getNode(self.p2Node, nodeId)
+            actingNode = self.p2Node.getNode(nodeId)
 
-        result = self.isValidMove(pnum, id, newX, newY)
+        result = self.isValidMove(pnum, nodeId, newX, newY)
         if result:
             self._applyMove(actingNode, newX, newY)
         return result
@@ -133,11 +140,13 @@ class BoardManager:
     '''
     Takes a node, and where it might be moved to, and checks if the move is valid. Returns True if it is, False otherwise
     '''
-    def isValidMove(self, pnum, id, newX, newY):
+    def isValidMove(self, pnum, nodeId, newX, newY):
         if pnum == 1:
-            actingNode = self.getNode(self.p1Node, id)
+            #actingNode = self.getNode(self.p1Node, id)
+            actingNode = self.p1Node.getNode(nodeId)
         else:
-            actingNode = self.getNode(self.p2Node, id)
+            #actingNode = self.getNode(self.p2Node, id)
+            actingNode = self.p2Node.getNode(nodeId)
         return (newX >= 0 and 
                 newY >= 0 and 
                 newX <= self.boardSizeX and 

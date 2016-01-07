@@ -36,33 +36,33 @@ def testmakeMoveInvalidOutOfBounds():
 
 #test the _applyMove function
 def test_ApplyMove():
-	bm = BoardManager(1000, 1000, {'startDepth':0})
+	bm = BoardManager(1000, 1000, {'startDepth':1})
 	bm._applyMove(bm.p1Node, -1, -2) #wouldn't be allowed if there was error checking
 	assert bm.p1Node.x == -1 and bm.p1Node.y == -2
 
 #test the isValidMove function
 def testIsValidMoveValid():
-	bm = BoardManager(1000, 1000, {'startDepth':0})
+	bm = BoardManager(1000, 1000, {'startDepth':1})
 	assert bm.isValidMove(2, bm.p2Node.ID, bm.p2Node.x + 1, bm.p2Node.y + 1)
 def testIsValidMoveInvalidTooFar():
-	bm = BoardManager(1000, 1000, {'startDepth':0})
+	bm = BoardManager(1000, 1000, {'startDepth':1})
 	assert not bm.isValidMove(2, bm.p2Node.ID, bm.p2Node.x + 10000, bm.p2Node.y + 10000)
 def testIsValidMoveInvalidOutOfBounds():
-	bm = BoardManager(1000, 1000, {'startDepth':0})
+	bm = BoardManager(1000, 1000, {'startDepth':1})
 	assert not bm.isValidMove(1, bm.p1Node.ID, -100, bm.p1Node.y)
 
 
 #test the buildTree function
 #could really use some more tests, especially of correct placement of children, both in the tree and on the board
-def testBuildTreeDepth0p1Node():
-	bm = BoardManager(1000, 1000, {'startDepth':0})
-	assert bm.p1Node == Node(bm.boardSizeX / 8, bm.boardSizeY / 2, 0, {})
-def testBuildTreeDepth0p2Node():
-	bm = BoardManager(1000, 1000, {'startDepth':0})
-	assert bm.p2Node == Node(bm.boardSizeX - (bm.boardSizeX / 8), bm.boardSizeY / 2, 1, {})
-def testBuildTreeDepth1():
-	bm = BoardManager(1000, 1000, {'startDepth':1, 'numChildren':2})
-	assert len(bm.p1Node.children) == 2 and len(bm.p2Node.children) == 2
+def testBuildTreeDepth1p1Node():
+	bm = BoardManager(1000, 1000, {'startDepth':1, 'numChildren':1})
+	assert bm.p1Node.ID is not None and bm.p1Node.x is not None and bm.p1Node.y is not None and len(bm.p1Node.children) == 1
+def testBuildTreeDepth1p2Node():
+	bm = BoardManager(1000, 1000, {'startDepth':1, 'numChildren':5})
+	assert bm.p2Node.ID is not None and bm.p2Node.x is not None and bm.p2Node.y is not None and len(bm.p2Node.children) == 5
+def testBuildTreeDepth2Children():
+	bm = BoardManager(1000, 1000, {'startDepth':2, 'numChildren':2})
+	assert len((bm.p1Node.children[bm.p1Node.children.keys()[0]]).children) == 2 and len((bm.p2Node.children[bm.p2Node.children.keys()[0]]).children) == 2
 
 def testSetIndexValidIndex():
     import random
