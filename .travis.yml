@@ -8,8 +8,6 @@ before_install:
  - "pip install pytest-cov"
  - "pip install pytest-pep8"
 # command to install dependencies
-install:
-  - "pip install ."
 # command to run tests
 script:
 #  - py.test tests --doctest-modules --pep8 -v --cov-report term-missing --cov=/home/travis/virtualenv/python$(python -c 'import sys; print(".".join(str(x) for x in sys.version_info[0:3]))')/lib/python$(python -c 'import sys; print(".".join(str(x) for x in sys.version_info[0:2]))')/site-packages/hypatia
