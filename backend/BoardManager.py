@@ -25,8 +25,8 @@ class BoardManager:
     '''
     #TODO remove checked from everywhere
     def __init__(self, boardSizeX, boardSizeY, configs = {}):
-        self.boardSizeX = boardSizeX
-        self.boardSizeY = boardSizeY
+        self.boardSizeX = int(boardSizeX)
+        self.boardSizeY = int(boardSizeY)
         
         #interpret configs dict
         self.maxDistance = configs.get('maxDistance', 25)
