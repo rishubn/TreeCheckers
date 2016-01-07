@@ -11,7 +11,7 @@ def testGetNode():
 	n0.addChild(n3)
 	n1.addChild(n2)
 	for childID in n1.children:
-		print childID
+		print(childID)
 	output = n0.getNode(2)
 	assert output == n2
 def testGetNode2():
