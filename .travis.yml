@@ -1,4 +1,5 @@
 language: python
+sudo: require
 python:
     - "3.4"
 before_install:
