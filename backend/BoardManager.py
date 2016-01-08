@@ -38,14 +38,14 @@ class BoardManager:
 
         #build board for player 1
         self.positionMap = {} #must be before buildTree is called
-        #self.p1Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
-       # self.setIndexes(self.p1Node, self.numChildren)
-      #  self.mapXY(self.p1Node, self.numChildren)
+        self.p1Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
+        self.setIndexes(self.p1Node, self.numChildren)
+        self.mapXY(self.p1Node, self.numChildren)
         #build board for player 2
         self.positionMap = {} #must be before buildTree is called
-     #   self.p2Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
-    #    self.setIndexes(self.p2Node, self.numChildren)
-   #     self.mapXY(self.p2Node, self.numChildren)
+        self.p2Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
+        self.setIndexes(self.p2Node, self.numChildren)
+        self.mapXY(self.p2Node, self.numChildren)
     
     # @FCC Jan 4 2016
     # Recursively builds tree, IDs in preorder
