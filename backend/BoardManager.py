@@ -38,14 +38,14 @@ class BoardManager:
 
         #build board for player 1
         self.positionMap = {} #must be before buildTree is called
-        self.p1Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
-        self.setIndexes(self.p1Node, self.numChildren)
-        self.mapXY(self.p1Node, self.numChildren)
+        #self.p1Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
+       # self.setIndexes(self.p1Node, self.numChildren)
+      #  self.mapXY(self.p1Node, self.numChildren)
         #build board for player 2
         self.positionMap = {} #must be before buildTree is called
-        self.p2Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
-        self.setIndexes(self.p2Node, self.numChildren)
-        self.mapXY(self.p2Node, self.numChildren)
+     #   self.p2Node = self.buildTree(self.depth, self.numChildren, self.getNextId())
+    #    self.setIndexes(self.p2Node, self.numChildren)
+   #     self.mapXY(self.p2Node, self.numChildren)
     
     # @FCC Jan 4 2016
     # Recursively builds tree, IDs in preorder
@@ -69,11 +69,12 @@ class BoardManager:
             if self.positionMap[root.ID][0] == 0 and self.positionMap[root.ID][1] == -1:
                 parentindex = 1
                 self.positionMap[root.ID][1] = parentindex
-            i = numChildren-1
+            i = numChildren -1
             for ids,child in root.children.items():
                 index = parentindex * numChildren - i
                 self.positionMap[child.ID][1] = index
                 i = i - 1
+                print("ID: " + str(ids) + " parentindex: " + str(parentindex) + " numChildren: " + str(numChildren) + "index: " + str(index) + " i: " + str(i))
             for ids,child in root.children.items():
                 self.setIndexes(child,numChildren,self.positionMap[child.ID][1])
     
@@ -84,12 +85,12 @@ class BoardManager:
         for ids, positions in self.positionMap.items():
             depth = positions[0]
             index = positions[1]
-            x = index * self.boardSizeX / (2 ** depth + numChildren - 1)
+            print(index)
+            x = index * self.boardSizeX / (2 ** depth +(numChildren-1))
             y = depth * self.boardSizeY / self.depth
-            
             actingNode = root.getNode(ids)
             actingNode.x = x
-            actingNode.y = y            
+            actingNode.y = y+10
     
     # this code is from before a refactoring effort. It has since turned into three functions, 
     # isValidMove,

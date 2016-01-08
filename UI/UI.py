@@ -27,11 +27,21 @@ class UI:
         self.printed.add(self.p2Node)
         self.drawTeamCircles(self.p2Node)        
 
+    def drawTree(self,root):
+        print(root.ID)
+        if root:
+            pygame.draw.circle(self.windowSurface,self.BLUE,(math.floor(root.x),math.floor(root.y)),5,0)
+            for id,child in root.children.items():
+                pygame.draw.line(self.windowSurface,self.RED,(math.floor(root.x),math.floor(root.y)),(math.floor(child.x),math.floor(child.y)),2)
+                self.drawTree(child)
+        pygame.display.update()
+
+
     """
     Draws all the circles below the given Node. If the given node is the root of a team, this function will draw every node on that team.
     """
     def drawTeamCircles(self, root):
-        pygame.draw.circle(self.windowSurface, self.BLUE, (math.floor(root.x), math.floor(root.y)),20,0)
+        pygame.draw.circle(self.windowSurface, self.BLUE, (math.floor(root.x), math.floor(root.y)),2,0)
         pygame.display.update() #perhaps update should just be called once, at the end of this method? -Forrest Dec 29 2015
         for childID in root.children:
             if childID not in self.printed:
