@@ -26,7 +26,6 @@ class UI:
         self.drawTeamCircles(self.p2Node)        
 
     def drawTree(self,root):
-        print(root.ID)
         if root:
             pygame.draw.circle(self.windowSurface,self.BLUE,(math.floor(root.x),math.floor(root.y)),5,0)
             for id,child in root.children.items():

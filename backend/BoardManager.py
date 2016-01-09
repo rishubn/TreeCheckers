@@ -88,6 +88,7 @@ class BoardManager:
                 self.positionMap[child.ID][1] = index
                 i = i - 1
                 #print("ID: " + str(ids) + " parentindex: " + str(parentindex) + " numChildren: " + str(numChildren) + "index: " + str(index) + " i: " + str(i))
+
             for ids,child in root.children.items():
                 self.setIndexes(child,numChildren,self.positionMap[child.ID][1])
     
@@ -98,8 +99,7 @@ class BoardManager:
         for ids, positions in self.positionMap.items():
             depth = positions[0]
             index = positions[1]
-            #print(index)
-            x = index * self.boardSizeX / (2 ** depth +(numChildren-1))
+            x = index * self.boardSizeX / (numChildren ** depth +1)
             y = depth * self.boardSizeY / self.depth
             actingNode = root.getNode(ids)
             actingNode.x = x
