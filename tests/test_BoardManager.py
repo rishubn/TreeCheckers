@@ -1,4 +1,4 @@
-import pytest, math
+import pytest, math, numpy
 from backend.Node import Node
 from backend.BoardManager import BoardManager
 
@@ -51,6 +51,18 @@ def testIsValidMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
 	assert not bm.isValidMove(1, bm.p1Node.ID, -100, bm.p1Node.y)
 
+#test the rotation matrix function
+def testRotMatrixtheq0():
+	bm = BoardManager(1000, 1000)
+	rm = numpy.array([[1,0],
+					  [0,1]])
+	assert numpy.allclose(bm.rotMatrix(0), rm)
+def testRotMatrixRotatepi():
+	bm = BoardManager(1000, 1000)
+	rm = bm.rotMatrix(math.pi)
+	vec = numpy.array([[1], [1]])
+	print (rm.dot(vec))
+	assert numpy.allclose(rm.dot(vec), numpy.array([[-1.0], [-1.0]]))
 
 #test the buildTree function
 #could really use some more tests, especially of correct placement of children, both in the tree and on the board

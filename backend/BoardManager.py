@@ -1,4 +1,4 @@
-import math
+import math, numpy
 from backend.Node import Node
 
 class BoardManager:
@@ -47,6 +47,14 @@ class BoardManager:
         self.setIndexes(self.p2Node, self.numChildren)
         self.mapXY(self.p2Node, self.numChildren)
     
+    """
+    Argument is in Radians, not degrees
+    """
+    def rotMatrix(self, theta):
+        
+        return numpy.array([[math.cos(theta), -1 * math.sin(theta)],
+                            [math.sin(theta),      math.cos(theta)]])
+        
     # @FCC Jan 4 2016
     # Recursively builds tree, IDs in preorder
     def buildTree(self,depth, numChildren, lastid):
