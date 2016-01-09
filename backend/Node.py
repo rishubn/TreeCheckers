@@ -1,17 +1,32 @@
+import numpy
 class Node:
-    x = None
-    y = None
+    loc = None
     ID = None
     children = {}
     def __init__(self, x, y, ID, children = None):
-        self.x = x
-        self.y = y
+        self.loc = numpy.array([[x],[y]])
+        self.loc.setflags(write = True)
         self.ID = ID
         self.children = {} if children is None else children #stupidly, just making {} be the default argument in the header causes all nodes to have the same list of children.
 
-    ''' Take a Node and add it to the list of children
-     
-    '''
+    @property
+    def x(self):
+        return self.loc[0][0]
+    @x.setter
+    def x(self, x):
+        self.loc[0][0] = x
+        #self.loc = numpy.array([[x],[self.loc[1][0]]])
+
+    @property
+    def y(self):
+        return self.loc[1][0]
+    @y.setter
+    def y(self, y):
+        self.loc[1][0] = y
+        #self.loc = numpy.array([[self.loc[0][0]], [y]])
+    
+
+    #Take a Node and add it to the list of children
     def addChild(self, child):
         try:
             self.children[child.ID] = child
@@ -50,11 +65,11 @@ class Node:
         
     def __eq__(self, other):
         try:
-            return self.ID == other.ID and self.x == other.x and self.y == other.y
+            return self.ID == other.ID and numpy.allclose(self.loc, other.loc)
         except AttributeError: #if it doesn't talk like a duck or doesn't walk like a duck or something like that, it's probably not the duck we're looking for
             return False
     def __ne__(self, other):
         try:
-            return self.ID != other.ID or  self.x != other.x or  self.y != other.y
+            return self.ID != other.ID or  not numpy.allclose(self.loc, other.loc)
         except AttributeError: #if it doesn't talk like a duck or doesn't walk like a duck or something like that, it's probably not the duck we're looking for
             return True

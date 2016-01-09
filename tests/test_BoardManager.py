@@ -25,31 +25,31 @@ def testGetNodeDistanceEuclidean():
 #test the makeMove function
 def testMakeMoveValid():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
-	assert bm.makeMove(1, 0, 1 + bm.p1Node.x, 1 + bm.p1Node.y) #should return true because it was a valid move
+	assert bm.makeMove(0, 0, 1 + bm.roots[0].x, 1 + bm.roots[0].y) #should return true because it was a valid move
 def testMakeMoveInvalidInBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
-	assert not bm.makeMove(1, bm.p1Node.ID, 25 + bm.p1Node.x, 25 + bm.p1Node.y) #should return false because it was an invalid move because it was too far
+	assert not bm.makeMove(0, bm.roots[0].ID, 25 + bm.roots[0].x, 25 + bm.roots[0].y) #should return false because it was an invalid move because it was too far
 def testmakeMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
-	bm.p1Node.x = 1
-	assert not bm.makeMove(1, 0, -2 + bm.p1Node.x, bm.p1Node.y) #should return false because it was an invalid move becuase it went outside the playing area
+	bm.roots[0].x = 1
+	assert not bm.makeMove(0, 0, -2 + bm.roots[0].x, bm.roots[0].y) #should return false because it was an invalid move becuase it went outside the playing area
 
 #test the _applyMove function
 def test_ApplyMove():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
-	bm._applyMove(bm.p1Node, -1, -2) #wouldn't be allowed if there was error checking
-	assert bm.p1Node.x == -1 and bm.p1Node.y == -2
+	bm._applyMove(bm.roots[0], -1, -2) #wouldn't be allowed if there was error checking
+	assert bm.roots[0].x == -1 and bm.roots[0].y == -2
 
 #test the isValidMove function
 def testIsValidMoveValid():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
-	assert bm.isValidMove(2, bm.p2Node.ID, bm.p2Node.x + 1, bm.p2Node.y + 1)
+	assert bm.isValidMove(1, bm.roots[1].ID, bm.roots[1].x + 1, bm.roots[1].y + 1)
 def testIsValidMoveInvalidTooFar():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
-	assert not bm.isValidMove(2, bm.p2Node.ID, bm.p2Node.x + 10000, bm.p2Node.y + 10000)
+	assert not bm.isValidMove(1, bm.roots[1].ID, bm.roots[1].x + 10000, bm.roots[1].y + 10000)
 def testIsValidMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
-	assert not bm.isValidMove(1, bm.p1Node.ID, -100, bm.p1Node.y)
+	assert not bm.isValidMove(1, bm.roots[1].ID, -100, bm.roots[1].y)
 
 #test the rotation matrix function
 def testRotMatrixtheq0():
@@ -64,20 +64,34 @@ def testRotMatrixRotatepi():
 	print (rm.dot(vec))
 	assert numpy.allclose(rm.dot(vec), numpy.array([[-1.0], [-1.0]]))
 
+#test the rotateTree function
+def testRotateTreeCenter00():
+	bm = BoardManager(1000, 1000, testing_mode = True)
+	root = Node(0, 0, 0)
+	bm.rotateTree(root, bm.rotMatrix(1))
+	n = Node(0, 0, 0)
+	assert numpy.allclose(root.loc, n.loc)
+def testRotateTreeCenter11():
+	bm = BoardManager(1000, 1000, testing_mode = True)
+	root = Node(0, 0, 0)
+	bm.rotateTree(root, bm.rotMatrix(math.pi), center = numpy.array([[1],[1]]))
+	n = Node(2, 2, 2)
+	assert numpy.allclose(root.loc, n.loc)
+
 #test the buildTree function
 #could really use some more tests, especially of correct placement of children, both in the tree and on the board
-def testBuildTreeDepth1p1Node():
+def testBuildTreeDepth1p0Node():
 	bm = BoardManager(1000, 1000, {'startDepth':1, 'numChildren':1})
-	assert bm.p1Node.ID is not None and bm.p1Node.x is not None and bm.p1Node.y is not None and len(bm.p1Node.children) == 1
-def testBuildTreeDepth1p2Node():
+	assert bm.roots[0].ID is not None and bm.roots[0].x is not None and bm.roots[0].y is not None and len(bm.roots[0].children) == 1
+def testBuildTreeDepth1p1Node():
 	bm = BoardManager(1000, 1000, {'startDepth':1, 'numChildren':5})
-	assert bm.p2Node.ID is not None and bm.p2Node.x is not None and bm.p2Node.y is not None and len(bm.p2Node.children) == 5
+	assert bm.roots[1].ID is not None and bm.roots[1].x is not None and bm.roots[1].y is not None and len(bm.roots[1].children) == 5
 def testBuildTreeDepth2Children():
 	bm = BoardManager(1000, 1000, {'startDepth':2, 'numChildren':2})
-	assert len((bm.p1Node.children[
-            list(bm.p1Node.children.keys())[0]
-            ]).children) == 2 and len((bm.p2Node.children[
-            list(bm.p2Node.children.keys())[0]]).children) == 2
+	assert len((bm.roots[0].children[
+            list(bm.roots[0].children.keys())[0]
+            ]).children) == 2 and len((bm.roots[1].children[
+            list(bm.roots[1].children.keys())[0]]).children) == 2
 
 def testSetIndexValidIndex():
     import random

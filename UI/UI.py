@@ -3,8 +3,7 @@ from pygame.locals import *
 
 class UI:
     #fields
-    p1Node = None
-    p2Node = None
+    roots = []
     windowSurface = None
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -12,10 +11,9 @@ class UI:
     GREEN = (0, 255, 0)
     BLUE = (0, 0, 255)
 
-    def __init__(self, p1Node, p2Node):
+    def __init__(self, roots):
         pygame.init()
-        self.p1Node = p1Node
-        self.p2Node = p2Node
+        self.roots = roots
         self.windowSurface = pygame.display.set_mode((800,600),0,32) #make 800x600 window
         self.windowSurface.fill(self.WHITE)
         pygame.display.update()  #draw the empty window
@@ -48,12 +46,11 @@ class UI:
                 self.printed.add(childID)
                 self.drawTeamCircles(root.getChild(childID))
 
-    def updateBoard(self, p1New, p2New):
+    def updateBoard(self, newRoots):
         #play animations and whatnot as approprate
 
         #set new board
-        self.p1Node = p1New
-        self.p2Node = p2New
+        self.roots = newRoots
 
 
             

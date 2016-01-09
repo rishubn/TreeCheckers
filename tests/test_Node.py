@@ -25,6 +25,27 @@ def testGetNode2():
 	output = n0.getNode(2, root = n0)
 	assert output == n2
 
+#test the .x property setter
+def testXSetterWithXGetter():
+	n0 = Node(0, 0, 0)
+	n0.x = 1
+	assert n0.x == 1
+def testXSetterWithLoc():
+	n0 = Node(0, 0, 0)
+	n0.x = 1
+	print (n0.loc)
+	assert n0.loc[0][0] == 1
+#test the .y property setter
+def testYSetterWithXGetter():
+	n0 = Node(0, 0, 0)
+	n0.y = 1
+	assert n0.y == 1
+def testYSetterWithLoc():
+	n0 = Node(0, 0, 0)
+	n0.y = 1
+	print(n0.loc)
+	assert n0.loc[1][0] == 1
+
 #test the __eq()__ function
 def testNodeEq():
 	n0 = Node(0, 0, 0, {})
