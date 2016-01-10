@@ -53,7 +53,7 @@ class BoardManager:
         print root.loc
         root.loc = rm.dot(root.loc - center) + center
         for childID in root.children:
-            rotateTree(root.children[childID], rm, center)
+            self.rotateTree(root.children[childID], rm, center)
 
     #Argument is in Radians, not degrees
     def rotMatrix(self, theta):
