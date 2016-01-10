@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python3 -m pytest tests/test_BoardManager.py tests/test_Node.py
