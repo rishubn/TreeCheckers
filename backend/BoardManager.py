@@ -50,7 +50,7 @@ class BoardManager:
     
     #root should be a Node, theta should be a float (in radians) and center should be a 
     def rotateTree(self, root, rm, center = numpy.array([[0],[0]])):
-        print root.loc
+        print(root.loc)
         root.loc = rm.dot(root.loc - center) + center
         for childID in root.children:
             self.rotateTree(root.children[childID], rm, center)
