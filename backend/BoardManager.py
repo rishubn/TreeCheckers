@@ -39,6 +39,8 @@ class BoardManager:
         self.roots = [None] * self.numPlayers
         if self.depth < 1:
             self.depth = 1
+        if self.numChildren < 1:
+            self.numChildren = 1
         if not testing_mode:
             for i in range(0, self.numPlayers):
                 #build board for player 
@@ -51,7 +53,6 @@ class BoardManager:
     
     #root should be a Node, theta should be a float (in radians) and center should be a 
     def rotateTree(self, root, rm, center = numpy.array([[0],[0]])):
-        print(root.loc)
         root.loc = rm.dot(root.loc - center) + center
         for childID in root.children:
             self.rotateTree(root.children[childID], rm, center)
@@ -150,6 +151,29 @@ class BoardManager:
         actingNode.y = newY
 
         self.newBoardState = True
+
+    #takes node, node, node, float, float. Indicates whether moving killerNode from its current location to newX, newY would cause victimNode to die.
+    def doesKill(self, killerNode, victimNode, victimParent, newX, newY):
+        #if the x intervals the line segments inhabit do not overlap
+        if (min(killerNode.x, newX) > max(victimNode.x, victimParent.x) or min(victimNode.x, victimParent.x) > max(killerNode.x, newX)):
+            print("earlyfalse")
+            return False;
+        # the intersection of the x intervals each of the line segments inhabit. If the location where the lines intersect
+        # isn't in this interval, then the line segments don't intersect
+        xInterval = (max(min(killerNode.x, newX), min(victimNode.x, victimParent.x)),
+                     min(max(victimNode.x, victimParent.x), max(killerNode.x, newX)))
+        #slope of the line that connects the victim and its parent
+        vicSlope = (victimParent.y - victimNode.y) / (victimParent.x - victimNode.x)
+        #slope of the line that connects the killer's old location and its new location
+        kilSlope = (killerNode.y - newY) / (killerNode.x - newX)
+        #y-intercept of the line that connects the victim and its parent
+        vicIntercept = (-1 * vicSlope * victimNode.x) + victimNode.y
+        #y-intercept of the line that connects the killer's old location and its new location
+        kilIntercept = (-1 * kilSlope * newX) + newY
+        #location on the x axis where the two lines intersect
+        x = (vicIntercept - kilIntercept) / (kilSlope - vicSlope)
+
+        return x >= xInterval[0] and x <= xInterval[1] 
 
     def getNextId(self):
         self._next_id += 1

@@ -61,7 +61,6 @@ def testRotMatrixRotatepi():
 	bm = BoardManager(1000, 1000)
 	rm = bm.rotMatrix(math.pi)
 	vec = numpy.array([[1], [1]])
-	print (rm.dot(vec))
 	assert numpy.allclose(rm.dot(vec), numpy.array([[-1.0], [-1.0]]))
 
 #test the rotateTree function
@@ -92,6 +91,24 @@ def testBuildTreeDepth2Children():
             list(bm.roots[0].children.keys())[0]
             ]).children) == 2 and len((bm.roots[1].children[
             list(bm.roots[1].children.keys())[0]]).children) == 2
+
+#test doesKill function
+def testDoesKillDoes():
+	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1})
+	victim = Node(1, 1, 1)
+	root = Node(0, 0, 0, {victim.ID: victim})
+	killer = Node(0, 1, 2)
+	newX = 1
+	newY = 0
+	assert bm.doesKill(killerNode = killer, victimNode = victim, victimParent = root, newX = newX, newY = newY)
+def testDoesKillDoesnt():
+	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1})
+	victim = Node(1, 1, 1)
+	root = Node(0, 0, 0, {victim.ID: victim})
+	killer = Node(0, 1, 2)
+	newX = 0
+	newY = 2
+	assert not bm.doesKill(killerNode = killer, victimNode = victim, victimParent = root, newX = newX, newY = newY)
 
 def testSetIndexesValidIndex():
     depth = 3
