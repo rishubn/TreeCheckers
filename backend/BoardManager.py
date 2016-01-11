@@ -46,7 +46,8 @@ class BoardManager:
                 self.roots[i] = self.buildTree(self.depth, self.numChildren, self.getNextId())
                 self.setIndexes(self.roots[i], self.numChildren)
                 self.mapXY(self.roots[i], self.numChildren)
-                self.rotateTree(self.roots[i], self.rotMatrix(0), center = numpy.array([[boardSizeX/2],[boardSizeY/2]]))
+                r = 2 * math.pi * (i / self.numPlayers)
+                self.rotateTree(self.roots[i], self.rotMatrix(r), center = numpy.array([[boardSizeX/2],[boardSizeY/2]]))
     
     #root should be a Node, theta should be a float (in radians) and center should be a 
     def rotateTree(self, root, rm, center = numpy.array([[0],[0]])):
