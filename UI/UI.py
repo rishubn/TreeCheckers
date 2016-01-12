@@ -31,7 +31,6 @@ class UI:
             for id,child in root.children.items():
                 pygame.draw.line(self.windowSurface,self.RED,(math.floor(root.x),math.floor(root.y)),(math.floor(child.x),math.floor(child.y)),2)
                 self.drawTree(child)
-        pygame.display.update()
 
 
     """

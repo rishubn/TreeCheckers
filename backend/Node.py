@@ -63,6 +63,18 @@ class Node:
                     return output
         return default
         
+    def getNodeXY(self,pos,radius,root = None,default = None):
+        if root == None:
+            root = self
+        if root.x <= pos[0]+radius and root.x >= pos[0]-radius and root.y <= pos[1]+radius and root.y >= pos[1]-radius:
+            return root
+        elif root.children is not None:
+            for childID in root.children:
+                output = (root.getChild(childID)).getNodeXY(pos,radius)
+                if output is not None:
+                    return output
+        return default
+
     def __eq__(self, other):
         try:
             return self.ID == other.ID and numpy.allclose(self.loc, other.loc)

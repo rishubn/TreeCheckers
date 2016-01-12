@@ -32,18 +32,70 @@ for x in range(0,10):
 #print their coordinates
 print(*roots,sep='\n')
 """
-board = BoardManager(1000, 1000, {'startDepth':2})
-ui = UI(board.roots)
-#debugPrintBoardInfo(board)
+class Player:
+    _root = None
+    _node = None # Node to change
+    _clicked = False
+    def __init__(self,root):
+        self._root = root
 
-#gameloop
-while True:
-    ui.drawCircles() #maybe it should only draw if the board changes (i.e. immediately after update board, or even whenever updateBoard is called) -Forrest Dec 30 2015
-    while True:  #quit event handler
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-        if board.newBoardState:
-        	ui.updateBoard(board.roots)
+    def update(self):
+            if self._node is not None:
+                self._node.x = pygame.mouse.get_pos()[0]
+                self._node.y = pygame.mouse.get_pos()[1]
+                self._node = None
+
+
+def main(player):
+    event_loop(player)
+    player.update()
+
+def event_loop(player):
+    for event in pygame.event.get():
+        print(event)
+        if event.type == pygame.MOUSEBUTTONDOWN or player._clicked == True:
+            n = player._root.getNodeXY(event.pos,10)
+            if n is not None:
+                player._node = player._root.getNodeXY(event.pos,10)
+                print(player._node)
+            if not player._clicked:
+                player._clicked = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            player._node = None
+            player._clicked = False
+        elif event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+
+if __name__ == "__main__":
+    board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2},True)
+    u = UI(None)
+    board.positionMap = {}
+    root = board.buildTree(2,2,board.getNextId())
+    board.setIndexes(root,2)
+    board.mapXY(root,2)
+    u.drawTree(root)
+    p = Player(root)
+    clock = pygame.time.Clock()
+    while 1:
+        main(p)
+        pygame.display.update()
+        u.windowSurface.fill(u.WHITE)
+        u.drawTree(root)
+        clock.tick(60)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
