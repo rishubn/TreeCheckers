@@ -4,12 +4,10 @@ from backend.Node import Node
 class BoardManager:
     boardSizeX = None
     boardSizeY = None
-    #p1Node = None
-    #p2Node = None
     roots = []
     _next_id = -1
+    midpoints = {} #every node except root should have one entry in this dict, key ID, value tuple containing x midpoint, y midpoint.
     
-    #TODO to be moved to tree class
     #maps node ID to depth and index array
     positionMap = {}
     #flags
@@ -25,7 +23,6 @@ class BoardManager:
     ''' for best results, boardSizeX and boardSizeY should be positive integers, and configs should be a dictionary
       __init__ will use default values if configs does not contain necessary information
     '''
-    #TODO remove checked from everywhere
     def __init__(self, boardSizeX, boardSizeY, configs = {}, testing_mode = False):
         self.boardSizeX = int(boardSizeX)
         self.boardSizeY = int(boardSizeY)
@@ -36,11 +33,14 @@ class BoardManager:
         self.numChildren = int(configs.get('numChildren', 3))
         self.depth = int(configs.get('startDepth', 3))
         self.numPlayers = int(configs.get('numPlayers', 2))
+        self.killRadius = int(configs.get('killRadius', 10))
         self.roots = [None] * self.numPlayers
         if self.depth < 1:
             self.depth = 1
         if self.numChildren < 1:
             self.numChildren = 1
+        if self.killRadius < 0:
+            self.killRadius = 0.1
         if not testing_mode:
             for i in range(0, self.numPlayers):
                 #build board for player 
@@ -50,7 +50,15 @@ class BoardManager:
                 self.mapXY(self.roots[i], self.numChildren)
                 r = 2 * math.pi * (i / self.numPlayers)
                 self.rotateTree(self.roots[i], self.rotMatrix(r), center = numpy.array([[boardSizeX/2],[boardSizeY/2]]))
+                self.midpoints(self.roots[i])
     
+    #@FCC Jan 13 2016
+    #assemble a dict of midpoints for easier access during gameplay
+    def midpoints(self, root):
+        for childID in root.children:
+            self.midpoints[childID] = numpy.arrays([[root.children[childID].x], [root.children[childID].y]])
+            midpoints(children.childID)
+
     #root should be a Node, theta should be a float (in radians) and center should be a 
     def rotateTree(self, root, rm, center = numpy.array([[0],[0]])):
         root.loc = rm.dot(root.loc - center) + center
@@ -58,6 +66,7 @@ class BoardManager:
             self.rotateTree(root.children[childID], rm, center)
 
     #Argument is in Radians, not degrees
+    #@FCC Jan 11 2016
     def rotMatrix(self, theta):
         return numpy.array([[math.cos(theta), -1 * math.sin(theta)],
                             [math.sin(theta),      math.cos(theta)]])
@@ -107,11 +116,11 @@ class BoardManager:
             actingNode.x = x
             actingNode.y = y+10
     
-    ''' Takes the id of the node being moved, its new x location and its new y location
+    ''' Takes the number of the player that owns the node being moved, the id of the node being moved, its new x location and its new y location
       returns True if the move was valid and False if it was invalid. 
       if the move is valid, updates the board and sets the newBoardState flag to True
     '''
-    def makeMove(self,pnum, nodeId, newX, newY):
+    def makeMove(self, pnum, nodeId, newX, newY):
         try:
             actingNode = self.roots[pnum].getNode(nodeId)
         except IndexError:
@@ -123,6 +132,14 @@ class BoardManager:
         result = self.isValidMove(pnum, nodeId, newX, newY)
         if result:
             self._applyMove(actingNode, newX, newY)
+            #code below commented purely because the functions getKillList, kill, and killChild are untested. This *should* work just fine.
+            """
+            killList = getKillList(pnum, numpy.arrays([[newX], [newY]]))
+            #if the list is empty, it's False as far as the if statement is concerned
+            if killList:
+                for ID in killList:
+                    kill(ID)
+            """
         return result
 
     
@@ -151,7 +168,39 @@ class BoardManager:
         actingNode.y = newY
 
         self.newBoardState = True
+    
+    #returns a list of ids of nodes that will be killed if any node owned by player pnum moves to pos.  
+    #pnum is the number of the player who owns the moving node. x and y are the locations the node is moving to. 
+    def getKillList(pnum, pos):
+        r = [] #just in case a move could kill two nodes at once
+        for i in range(0, len(roots)):
+            if i != pnum:
+                output = roots[i].getNodeXY(pos, self.killRadius)
+                if output != None:
+                    r.append(output)
+        return r
 
+    #warning: this function will immediately kill the specified node (if it exists), no matter what.
+    #don't use it unless you're sure the node in question must die!
+    def kill(self, id, root = None):
+        if root:
+            rootList = [root]
+        else:
+            rootList = self.roots
+        for root in rootList:
+            killChild(id, root)
+
+    #warning: this function will immediately kill the specified node (if it is in root's tree), no matter what.
+    #don't use it unless you're sure the node in question must die!
+    def killChild(self, id, root):
+        for childID in root.children:
+            if childID == id:
+                del root.children[childID]
+                return None
+            killChild(id, root.children[childID])
+
+    #code is due to a misunderstanding about what causes a node to die. Don't delete it though, @FCC may post it online because it's actually kinda neat
+    """
     #takes node, node, node, float, float. Indicates whether moving killerNode from its current location to newX, newY would cause victimNode to die.
     def doesKill(self, killerNode, victimNode, victimParent, newX, newY):
         #if the x intervals the line segments inhabit do not overlap
@@ -174,7 +223,7 @@ class BoardManager:
         x = (vicIntercept - kilIntercept) / (kilSlope - vicSlope)
 
         return x >= xInterval[0] and x <= xInterval[1] 
-
+    """
     def getNextId(self):
         self._next_id += 1
         return self._next_id

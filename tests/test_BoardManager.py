@@ -29,10 +29,25 @@ def testMakeMoveValid():
 def testMakeMoveInvalidInBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
 	assert not bm.makeMove(0, bm.roots[0].ID, 25 + bm.roots[0].x, 25 + bm.roots[0].y) #should return false because it was an invalid move because it was too far
-def testmakeMoveInvalidOutOfBounds():
+def testMakeMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
 	bm.roots[0].x = 1
 	assert not bm.makeMove(0, 0, -2 + bm.roots[0].x, bm.roots[0].y) #should return false because it was an invalid move becuase it went outside the playing area
+def testMakeMoveValidKills():
+	#numChildren is set to ensure that the bm doesn't go into 'gameover' state when victim dies. 
+	#As of jan 13 2016 that behavior isn't implemented yet, but hopefully it will be one day.
+	bm = BoardManager(1000, 1000, {'startDepth':1, 'maxDistance': 100000, 'numChildren': 2})
+
+	#positioning the victim conveniently
+	#bypassing the move function becuase it's easier to avoid making an invalid move
+	bm.roots[0].children[bm.roots[0].children.keys()[0]].x = bm.roots[0].x + 2
+	bm.roots[0].children[bm.roots[0].children.keys()[0]].y = bm.roots[0].y
+	victimID = bm.roots[0].children[bm.roots[0].children.keys()[0]].ID
+	killerID = bm.roots[1].children[bm.roots[1].children.keys()[1]].ID
+
+	bm.makeMove(1, killerID, bm.roots[0].x + 1, bm.roots[0].y)
+
+	assert bm.roots[0].children[bm.roots[0].children.keys()[0]].ID != victimID #can't possibly be victimID if victim is dead
 
 #test the _applyMove function
 def test_ApplyMove():
@@ -95,11 +110,11 @@ def testBuildTreeDepth2Children():
 #test doesKill function
 def testDoesKillDoes():
 	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1})
-	victim = Node(1, 1, 1)
+	victim = Node(1, 2, 2)
 	root = Node(0, 0, 0, {victim.ID: victim})
 	killer = Node(0, 1, 2)
 	newX = 1
-	newY = 0
+	newY = 1
 	assert bm.doesKill(killerNode = killer, victimNode = victim, victimParent = root, newX = newX, newY = newY)
 def testDoesKillDoesnt():
 	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1})

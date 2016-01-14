@@ -63,7 +63,7 @@ class Node:
                     return output
         return default
         
-    def getNodeXY(self,pos,radius,root = None,default = None):
+    def getNodeXY(self, pos, radius, root = None, default = None):
         if root == None:
             root = self
         if root.x <= pos[0]+radius and root.x >= pos[0]-radius and root.y <= pos[1]+radius and root.y >= pos[1]-radius:
