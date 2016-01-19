@@ -53,19 +53,31 @@ def main(player):
 def event_loop(player):
     for event in pygame.event.get():
         print(event)
-        if event.type == pygame.MOUSEBUTTONDOWN or player._clicked == True:
-            n = player._root.getNodeXY(event.pos,10)
-            if n is not None:
-                player._node = player._root.getNodeXY(event.pos,10)
-                print(player._node)
-            if not player._clicked:
-                player._clicked = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            player._clicked = True
         elif event.type == pygame.MOUSEBUTTONUP:
-            player._node = None
             player._clicked = False
         elif event.type == QUIT:
             pygame.quit()
             sys.exit()
+        elif player._clicked == True:
+            if player._node is None:
+                try:
+                    n = player._root.getNodeXY(event.pos,10)
+                    if n is not None:
+                         player._node = n
+                except AttributeError:
+                    n = None
+        #if event.type == pygame.MOUSEBUTTONDOWN or player._clicked == True:
+        #    n = player._root.getNodeXY(event.pos,10)
+        #    if n is not None:
+        #        player._node = player._root.getNodeXY(event.pos,10)
+        #        print(player._node)
+        #    if not player._clicked:
+        #        player._clicked = True
+        #    else:
+        #        player._clicked = False
+
 
 if __name__ == "__main__":
     board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2},True)
