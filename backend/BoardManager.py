@@ -20,7 +20,7 @@ class BoardManager:
     depth = -1
     numPlayers = -1
 
-    ''' for best results, boardSizeX and boardSizeY should be positive integers, and configs should be a dictionary
+    ''' for best results, boardSizeX and boardSizeY should be positive integers, and configs should be a dictionary.
       __init__ will use default values if configs does not contain necessary information
     '''
     def __init__(self, boardSizeX, boardSizeY, configs = {}, testing_mode = False):
@@ -50,14 +50,14 @@ class BoardManager:
                 self.mapXY(self.roots[i], self.numChildren)
                 r = 2 * math.pi * (i / self.numPlayers)
                 self.rotateTree(self.roots[i], self.rotMatrix(r), center = numpy.array([[boardSizeX/2],[boardSizeY/2]]))
-                self.midpoints(self.roots[i])
+                self.buildMidpoints(self.roots[i])
     
     #@FCC Jan 13 2016
     #assemble a dict of midpoints for easier access during gameplay
-    def midpoints(self, root):
+    def buildMidpoints(self, root):
         for childID in root.children:
-            self.midpoints[childID] = numpy.arrays([[root.children[childID].x], [root.children[childID].y]])
-            midpoints(children.childID)
+            self.midpoints[childID] = numpy.array([[(root.children[childID].x + root.x) / 2], [(root.children[childID].y + root.y) / 2]])
+            self.buildMidpoints(root.children[childID])
 
     #root should be a Node, theta should be a float (in radians) and center should be a 
     def rotateTree(self, root, rm, center = numpy.array([[0],[0]])):
@@ -132,14 +132,12 @@ class BoardManager:
         result = self.isValidMove(pnum, nodeId, newX, newY)
         if result:
             self._applyMove(actingNode, newX, newY)
-            #code below commented purely because the functions getKillList, kill, and killChild are untested. This *should* work just fine.
-            """
-            killList = getKillList(pnum, numpy.arrays([[newX], [newY]]))
+            #code below commented purely because the functions getKillList, kill, and _killChild are untested. This *should* work just fine.
+            killList = self.getKillList(pnum, numpy.array([[newX], [newY]]))
             #if the list is empty, it's False as far as the if statement is concerned
             if killList:
                 for ID in killList:
-                    kill(ID)
-            """
+                    self.kill(ID)
         return result
 
     
@@ -164,40 +162,50 @@ class BoardManager:
     If you want to make a move with error checking (i.e. only make the move if it's valid) use the makeMove function. 
     '''
     def _applyMove(self, actingNode, newX, newY):
+        #if the moving node is not a root node, then we need to update the midpoints dict also. 
+        if not (actingNode.ID in map(lambda X: X.ID, self.roots)):
+            #infer the location of the parent
+            parentX = (self.midpoints[actingNode.ID][0][0] * 2) - actingNode.x
+            parentY = (self.midpoints[actingNode.ID][1][0] * 2) - actingNode.y
+            self.midpoints[actingNode.ID] = numpy.array([[(parentX + newX) / 2], [(parentY + newY) / 2]]) #update the midpoint appropriately
+
+        #update the node itself
         actingNode.x = newX
         actingNode.y = newY
 
-        self.newBoardState = True
+        self.newBoardState = True #notify UI
     
     #returns a list of ids of nodes that will be killed if any node owned by player pnum moves to pos.  
     #pnum is the number of the player who owns the moving node. x and y are the locations the node is moving to. 
-    def getKillList(pnum, pos):
-        r = [] #just in case a move could kill two nodes at once
-        for i in range(0, len(roots)):
+    def getKillList(self, pnum, pos):
+        r = [] 
+        for i in range(0, len(self.roots)):
             if i != pnum:
-                output = roots[i].getNodeXY(pos, self.killRadius)
-                if output != None:
-                    r.append(output)
+                output = self.roots[i].filterNodes(filterFunc = lambda X: self.getDistance(X.x, X.y, pos[0], pos[1]) <= self.killRadius)
+                output = map(lambda X: X.ID, output)
+                r.extend(output)
         return r
 
     #warning: this function will immediately kill the specified node (if it exists), no matter what.
     #don't use it unless you're sure the node in question must die!
-    def kill(self, id, root = None):
+    def kill(self, ID, root = None):
         if root:
             rootList = [root]
         else:
             rootList = self.roots
         for root in rootList:
-            killChild(id, root)
+            self._killChild(ID, root)
 
     #warning: this function will immediately kill the specified node (if it is in root's tree), no matter what.
     #don't use it unless you're sure the node in question must die!
-    def killChild(self, id, root):
+    def _killChild(self, ID, root):
+        if ID in root.children:
+            del root.children[ID]
+            del self.midpoints[ID]
+            return None #exit since we're done here
+        #else
         for childID in root.children:
-            if childID == id:
-                del root.children[childID]
-                return None
-            killChild(id, root.children[childID])
+            self._killChild(ID, root.children[childID])
 
     #code is due to a misunderstanding about what causes a node to die. Don't delete it though, @FCC may post it online because it's actually kinda neat
     """
