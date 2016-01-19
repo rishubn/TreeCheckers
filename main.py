@@ -43,7 +43,7 @@ class Player:
             if self._node is not None:
                 self._node.x = pygame.mouse.get_pos()[0]
                 self._node.y = pygame.mouse.get_pos()[1]
-                self._node = None
+                
 
 
 def main(player):
@@ -57,6 +57,7 @@ def event_loop(player):
             player._clicked = True
         elif event.type == pygame.MOUSEBUTTONUP:
             player._clicked = False
+            player._node = None
         elif event.type == QUIT:
             pygame.quit()
             sys.exit()
