@@ -1,4 +1,4 @@
-import numpy
+import math, numpy
 class Node:
     loc = None
     ID = None
@@ -63,17 +63,34 @@ class Node:
                     return output
         return default
         
-    def getNodeXY(self, pos, radius, root = None, default = None):
+    #pos is a tuple or list containing x at index 0 and y at index 1. radius is a positive number. Default can be anything. dist is a function that takes four numbers and returns one number.
+    #finds the closest node in the given tree to pos that is within radius. returns default if there is no such node.
+    def getNodeXY(self, pos, radius, root = None, default = None, dist = lambda x1,y1,x2,y2: math.sqrt((x1 - x2)**2 + (y1 - y2)**2)):
+        minNode = default
+        minDist = 9999999999
         if root == None:
             root = self
-        if root.x <= pos[0]+radius and root.x >= pos[0]-radius and root.y <= pos[1]+radius and root.y >= pos[1]-radius:
-            return root
+        if dist(root.x, root.y, pos[0], pos[1]) <= radius:
+            minNode = self
+            minDist = dist(root.x, root.y, pos[0], pos[1])
         elif root.children is not None:
             for childID in root.children:
                 output = (root.getChild(childID)).getNodeXY(pos,radius)
-                if output is not None:
-                    return output
-        return default
+                if output is not None and dist(output.x, output.y, pos[0], pos[1]) < minDist:
+                    minNode = output
+                    minDist = dist(output.x, output.y, pos[0], pos[1])
+        return minNode
+
+    #returns a list containing every node that evaluates to true under filterFunc. 
+    def filterNodes(self, root = None, filterFunc = lambda X: X is not None):
+        output = []
+        if root is None:
+            root = self
+        if filterFunc(root):
+            output.append(root)
+        for childID in root.children:
+            output.extend(self.filterNodes(root = root.children[childID], filterFunc = filterFunc))
+        return output
 
     def __eq__(self, other):
         try:
@@ -82,6 +99,6 @@ class Node:
             return False
     def __ne__(self, other):
         try:
-            return self.ID != other.ID or  not numpy.allclose(self.loc, other.loc)
+            return self.ID != other.ID or not numpy.allclose(self.loc, other.loc)
         except AttributeError: #if it doesn't talk like a duck or doesn't walk like a duck or something like that, it's probably not the duck we're looking for
             return True
