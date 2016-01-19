@@ -25,6 +25,21 @@ def testGetNode2():
 	output = n0.getNode(2, root = n0)
 	assert output == n2
 
+#test filterNodes
+def testFilterNodes():
+	n0 = Node(0, 0, 0)
+	n1 = Node(1, 1, 1)
+	n2 = Node(2, 2, 2)
+	n3 = Node(3, 3, 3)
+	n0.addChild(n1)
+	n1.addChild(n3)
+	n1.addChild(n2)
+	output = n0.filterNodes(filterFunc = lambda X: X.ID == 2)
+	print(len(output))
+	for n in output:
+		print(n.ID)
+	assert output == [n2]
+
 #test the .x property setter
 def testXSetterWithXGetter():
 	n0 = Node(0, 0, 0)

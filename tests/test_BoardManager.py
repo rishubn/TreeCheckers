@@ -40,22 +40,27 @@ def testMakeMoveValidKills():
 
 	#positioning the victim conveniently
 	#bypassing the move function becuase it's easier to avoid making an invalid move
-	bm.roots[0].children[bm.roots[0].children.keys()[0]].x = bm.roots[0].x + 2
-	bm.roots[0].children[bm.roots[0].children.keys()[0]].y = bm.roots[0].y
-	victimID = bm.roots[0].children[bm.roots[0].children.keys()[0]].ID
-	killerID = bm.roots[1].children[bm.roots[1].children.keys()[1]].ID
+	bm.roots[0].children[list(bm.roots[0].children.keys())[0]].x = bm.roots[0].x + 2
+	bm.roots[0].children[list(bm.roots[0].children.keys())[0]].y = bm.roots[0].y
+	victimID = bm.roots[0].children[list(bm.roots[0].children.keys())[0]].ID
+	killerID = bm.roots[1].children[list(bm.roots[1].children.keys())[1]].ID
 
 	bm.makeMove(1, killerID, bm.roots[0].x + 1, bm.roots[0].y)
 
-	assert bm.roots[0].children[bm.roots[0].children.keys()[0]].ID != victimID #can't possibly be victimID if victim is dead
+	assert victimID not in list(bm.roots[0].children.keys())
 
 #test the _applyMove function
 def test_ApplyMove():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
 	bm._applyMove(bm.roots[0], -1, -2) #wouldn't be allowed if there was error checking
 	assert bm.roots[0].x == -1 and bm.roots[0].y == -2
+def test_ApplyMoveMidpointAdjustment():
+	bm = BoardManager(1000, 1000, {'startDepth':1, 'numChildren':1})
+	ID = list(bm.roots[0].children.values())[0].ID
+	bm._applyMove(list(bm.roots[0].children.values())[0], -1, -2) #wouldn't be allowed if there was error checking
+	assert numpy.array_equal(bm.midpoints[ID], numpy.array([[(bm.roots[0].x + -1) / 2], [(bm.roots[0].y + -2) / 2]]))
 
-#test the isValidMove function
+	#test the isValidMove function
 def testIsValidMoveValid():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
 	assert bm.isValidMove(1, bm.roots[1].ID, bm.roots[1].x + 1, bm.roots[1].y + 1)
@@ -107,23 +112,28 @@ def testBuildTreeDepth2Children():
             ]).children) == 2 and len((bm.roots[1].children[
             list(bm.roots[1].children.keys())[0]]).children) == 2
 
+#test kill function
+def testKill():
+	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1})
+	targetID = list(bm.roots[0].children.keys())[0]
+	bm.kill(targetID)
+	assert not (targetID in bm.roots[0].children.keys())
+
+#test _killChild function
+def test_killChild():
+	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1})
+	targetID = list(bm.roots[0].children.keys())[0]
+	bm._killChild(targetID, bm.roots[0])
+	assert not (targetID in bm.roots[0].children.keys())
+
 #test doesKill function
-def testDoesKillDoes():
-	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1})
-	victim = Node(1, 2, 2)
-	root = Node(0, 0, 0, {victim.ID: victim})
-	killer = Node(0, 1, 2)
-	newX = 1
-	newY = 1
-	assert bm.doesKill(killerNode = killer, victimNode = victim, victimParent = root, newX = newX, newY = newY)
-def testDoesKillDoesnt():
-	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1})
-	victim = Node(1, 1, 1)
-	root = Node(0, 0, 0, {victim.ID: victim})
-	killer = Node(0, 1, 2)
-	newX = 0
-	newY = 2
-	assert not bm.doesKill(killerNode = killer, victimNode = victim, victimParent = root, newX = newX, newY = newY)
+def testGetKillList():
+	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1, 'killRadius':9999999})
+	victim = list(bm.roots[0].children.values())[0]
+	assert victim.ID in bm.getKillList(1, numpy.array([[0], [0]]))
+def testGetKillListEmpty():
+	bm = BoardManager(1000,1000, {'startDepth':1, 'numChildren':1, 'killRadius':0})
+	assert bm.getKillList(0, numpy.array([[0], [0]])) == []
 
 def testSetIndexesValidIndex():
     depth = 3
