@@ -4,7 +4,6 @@ from backend.Node import Node
 class BoardManager:
     boardSizeX = None
     boardSizeY = None
-    roots = []
     _next_id = -1
     midpoints = {} #every node except root should have one entry in this dict, key ID, value tuple containing x midpoint, y midpoint.
     
@@ -35,7 +34,6 @@ class BoardManager:
         self.depth = int(configs.get('startDepth', 3))
         self.numPlayers = int(configs.get('numPlayers', 2))
         self.killRadius = int(configs.get('killRadius', 10))
-        self.roots = [None] * self.numPlayers
         if self.depth < 1:
             self.depth = 1
         if self.numChildren < 1:
@@ -46,12 +44,13 @@ class BoardManager:
             for i in range(0, self.numPlayers):
                 #build board for player 
                 self.positionMap = {} #must be before buildTree is called
-                self.roots[i] = self.buildTree(self.depth, self.numChildren, self.getNextId())
-                self.setIndexes(self.roots[i], self.numChildren)
-                self.mapXY(self.roots[i], self.numChildren)
+                root = self.buildTree(self.depth, self.numChildren, self.getNextId())
+                self.setIndexes(root, self.numChildren)
+                self.mapXY(root, self.numChildren)
                 r = 2 * math.pi * (i / self.numPlayers)
-                self.rotateTree(self.roots[i], self.rotMatrix(r), center = numpy.array([[boardSizeX/2],[boardSizeY/2]]))
-                self.buildMidpoints(self.roots[i])
+                self.rotateTree(root, self.rotMatrix(r), center = numpy.array([[boardSizeX/2],[boardSizeY/2]]))
+                self.buildMidpoints(root)
+                self.addPlayer(i,root)
     
     #@FCC Jan 13 2016
     #assemble a dict of midpoints for easier access during gameplay

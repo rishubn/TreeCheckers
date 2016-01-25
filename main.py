@@ -60,14 +60,14 @@ def event_loop(player):
                     n = None
 #test
 if __name__ == "__main__":
-    board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2},True)
+    board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2})
     u = UI(None)
     board.positionMap = {}
     root = board.buildTree(2,2,board.getNextId())
     board.setIndexes(root,2)
     board.mapXY(root,2)
     u.drawTree(root)
-    board.addPlayer(0,root)
+   # board.addPlayer(0,root)
     print(board.players)
     clock = pygame.time.Clock()
     while 1:
