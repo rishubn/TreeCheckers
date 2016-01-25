@@ -10,6 +10,7 @@ class BoardManager:
     
     #maps node ID to depth and index array
     positionMap = {}
+    players = {}
     #flags
     newBoardState = False
     
@@ -247,3 +248,17 @@ class BoardManager:
             return self.getDistance(n1.x, n1.y, 0, 0)
         else:
             return self.getDistance(n1.x, n1.y, n2.x, n2.y)
+
+    def update(self,playerID,pos):
+        n = self.players[playerID]["node"]
+        if n is not None:
+            n.x = pos[0]
+            n.y = pos[1]
+
+    def addPlayer(self,ID,root):
+        playerExist = False
+        try:
+            self.players[ID]
+        except KeyError:
+            self.players[ID] = {"root": root, "node": None, "update": self.update, "clicked": False}
+

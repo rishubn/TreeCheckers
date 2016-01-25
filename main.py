@@ -32,41 +32,30 @@ for x in range(0,10):
 #print their coordinates
 print(*roots,sep='\n')
 """
-class Player:
-    _root = None
-    _node = None # Node to change
-    _clicked = False
-    def __init__(self,root):
-        self._root = root
-
-    def update(self):
-            if self._node is not None:
-                self._node.x = pygame.mouse.get_pos()[0]
-                self._node.y = pygame.mouse.get_pos()[1]
-                
 
 
-def main(player):
+
+def main(player,ID):
     event_loop(player)
-    player.update()
+    player["update"](ID,pygame.mouse.get_pos())
 
 def event_loop(player):
     for event in pygame.event.get():
         print(event)
         if event.type == pygame.MOUSEBUTTONDOWN:
-            player._clicked = True
+            player["clicked"] = True
         elif event.type == pygame.MOUSEBUTTONUP:
-            player._clicked = False
-            player._node = None
+            player["clicked"] = False
+            player["node"] = None
         elif event.type == QUIT:
             pygame.quit()
             sys.exit()
-        elif player._clicked == True:
-            if player._node is None:
+        elif player["clicked"] == True:
+            if player["node"] is None:
                 try:
-                    n = player._root.getNodeXY(event.pos,10)
+                    n = player["root"].getNodeXY(event.pos,10)
                     if n is not None:
-                         player._node = n
+                         player["node"] = n
                 except AttributeError:
                     n = None
 #test
@@ -78,13 +67,14 @@ if __name__ == "__main__":
     board.setIndexes(root,2)
     board.mapXY(root,2)
     u.drawTree(root)
-    p = Player(root)
+    board.addPlayer(0,root)
+    print(board.players)
     clock = pygame.time.Clock()
     while 1:
-        main(p)
+        main(board.players[0],0)
         pygame.display.update()
         u.windowSurface.fill(u.WHITE)
-        u.drawTree(root)
+        u.drawTree(board.players[0]["root"]) 
         clock.tick(60)
 
 
