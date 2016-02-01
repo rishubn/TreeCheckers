@@ -122,7 +122,7 @@ class BoardManager:
       returns True if the move was valid and False if it was invalid. 
       if the move is valid, updates the board and sets the newBoardState flag to True
     '''
-    def makeMove(self, pnum, nodeId, newX, newY):
+    def makeMove(self, pnum, nodeId, positions):
         try:
             actingNode = self.roots[pnum].getNode(nodeId)
         except IndexError:
@@ -131,49 +131,46 @@ class BoardManager:
                       returning False and continuing execution.""".format(pnum, len(self.roots)))
             return False
 
-        result = self.isValidMove(pnum, nodeId, newX, newY)
+        result = self.isValidMove(positions)
+        print(result)
         if result:
-            self._applyMove(actingNode, newX, newY)
+            self._applyMove(actingNode.ID, positions)
             #code below commented purely because the functions getKillList, kill, and _killChild are untested. This *should* work just fine.
-            killList = self.getKillList(pnum, numpy.array([[newX], [newY]]))
+            killList = self.getKillList(pnum, numpy.array([[positions[2]], [positions[3]]]))
             #if the list is empty, it's False as far as the if statement is concerned
             if killList:
                 for ID in killList:
                     self.kill(ID)
+        if not result:
+            actingNode.x = positions[0]
+            actingNode.y = positions[1]
+            print("invalidmove")
         return result
 
     
     #Takes a node, and where it might be moved to, and checks if the move is valid. Returns True if it is, False otherwise
-    def isValidMove(self, pnum, nodeId, newX, newY):
-        try:
-            actingNode = self.roots[pnum].getNode(nodeId)
-        except IndexError:
-            print ("""In makeMove:\n
-                      Attempt to access nonexistent player root for player number {0} was made (there are only {1} players).\n
-                      returning False and continuing execution.""".format(pnum, len(self.roots)))
-            return False
-
-        return (newX >= 0 and 
-                newY >= 0 and 
-                newX <= self.boardSizeX and 
-                newY <= self.boardSizeY and 
-                self.getDistance(actingNode.x, actingNode.y, newX, newY) <= self.maxDistance)
+    def isValidMove(self, positions):
+        print(self.getDistance(positions[0],positions[1],positions[2],positions[3]))
+        return (positions[2] >= 0 and 
+                positions[3] >= 0 and 
+                positions[2] <= self.boardSizeX+1000 and 
+                positions[3] <= self.boardSizeY+1000 and 
+                self.getDistance(positions[0],positions[1],positions[2],positions[3]) <= self.maxDistance)
 
     '''
     Takes a node and moves it. Also informs everyone that the board has changed. there is absolutely no error checking here, so only use this if you've done your error checking!
     If you want to make a move with error checking (i.e. only make the move if it's valid) use the makeMove function. 
     '''
-    def _applyMove(self, actingNode, newX, newY):
+    def _applyMove(self, actingNodeID, positions):
         #if the moving node is not a root node, then we need to update the midpoints dict also. 
-        if not (actingNode.ID in map(lambda X: X.ID, self.roots)):
+        if not (actingNodeID in map(lambda X: X.ID, self.roots)):
             #infer the location of the parent
-            parentX = (self.midpoints[actingNode.ID][0][0] * 2) - actingNode.x
-            parentY = (self.midpoints[actingNode.ID][1][0] * 2) - actingNode.y
-            self.midpoints[actingNode.ID] = numpy.array([[(parentX + newX) / 2], [(parentY + newY) / 2]]) #update the midpoint appropriately
+            parentX = (self.midpoints[actingNodeID][0][0] * 2) - positions[0]
+            parentY = (self.midpoints[actingNodeID][1][0] * 2) - positions[1]
+            self.midpoints[actingNodeID] = numpy.array([[(parentX + positions[2]) / 2], [(parentY + positions[3]) / 2]]) #update the midpoint appropriately
 
         #update the node itself
-        actingNode.x = newX
-        actingNode.y = newY
+
 
         self.newBoardState = True #notify UI
     
@@ -250,11 +247,8 @@ class BoardManager:
         else:
             return self.getDistance(n1.x, n1.y, n2.x, n2.y)
 
-    def update(self,playerID,pos):
-        n = self.players[playerID]["node"]
-        if n is not None:
-            n.x = pos[0]
-            n.y = pos[1]
+    def update(self,playerID,nodeID,pos):
+        self.makeMove(playerID,nodeID,pos)
 
     def addPlayer(self,ID,root):
         playerExist = False

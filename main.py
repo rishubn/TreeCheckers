@@ -34,33 +34,46 @@ print(*roots,sep='\n')
 """
 
 
-
+nodet = None
+def updatePos(ID, pos):
+    if nodet:
+        nodet.x = pos[0]
+        nodet.y = pos[1]
+        
 def main(player,ID):
-    event_loop(player)
-    player["update"](ID,pygame.mouse.get_pos())
+    event_loop(player,ID)
+    updatePos(ID,pygame.mouse.get_pos())
 
-def event_loop(player):
+def event_loop(player,ID):
+    global nodet
     for event in pygame.event.get():
         print(event)
         if event.type == pygame.MOUSEBUTTONDOWN:
             player["clicked"] = True
         elif event.type == pygame.MOUSEBUTTONUP:
             player["clicked"] = False
-            player["node"] = None
+            if nodet:
+                player["node"][2] = nodet.x
+                player["node"][3] = nodet.y
+                player["update"](ID,nodet.ID,player["node"])
+                print(player)
+            nodet = None
         elif event.type == QUIT:
             pygame.quit()
             sys.exit()
         elif player["clicked"] == True:
-            if player["node"] is None:
+            if nodet is None:
                 try:
-                    n = player["root"].getNodeXY(event.pos,10)
-                    if n is not None:
-                         player["node"] = n
+                    nodet = player["root"].getNodeXY(event.pos,10)
+                    player["node"] = [nodet.x,nodet.y,-1,-1]
+                    print(player["node"])
+                  #  if nodet is not None:
+                        #player["node"] = nodet
                 except AttributeError:
-                    n = None
+                    nodet = None
 #test
 if __name__ == "__main__":
-    board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2})
+    board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2, 'maxDistance':50})
     u = UI(None)
     board.positionMap = {}
     root = board.buildTree(2,2,board.getNextId())
@@ -75,6 +88,7 @@ if __name__ == "__main__":
         pygame.display.update()
         u.windowSurface.fill(u.WHITE)
         u.drawTree(board.players[0]["root"]) 
+        u.drawMidpoints(board.midpoints)
         clock.tick(60)
 
 

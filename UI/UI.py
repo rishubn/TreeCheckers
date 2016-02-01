@@ -31,7 +31,12 @@ class UI:
             for id,child in root.children.items():
                 pygame.draw.line(self.windowSurface,self.RED,(math.floor(root.x),math.floor(root.y)),(math.floor(child.x),math.floor(child.y)),2)
                 self.drawTree(child)
-
+   
+    def drawMidpoints(self,midpoints):
+        if midpoints:
+            for i in midpoints:
+                root = midpoints[i]
+                pygame.draw.circle(self.windowSurface,self.GREEN,(math.floor(root[0][0]),math.floor(root[1][0])),3,0)
 
     """
     Draws all the circles below the given Node. If the given node is the root of a team, this function will draw every node on that team.
