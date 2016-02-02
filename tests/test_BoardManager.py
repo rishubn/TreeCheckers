@@ -25,14 +25,14 @@ def testGetNodeDistanceEuclidean():
 #test the makeMove function
 def testMakeMoveValid():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
-	assert bm.makeMove(0, 0, 1 + bm.roots[0].x, 1 + bm.roots[0].y) #should return true because it was a valid move
+	assert bm.makeMove(0, 0, [bm.roots[0].x,bm.roots[0].y,1 + bm.roots[0].x, 1 + bm.roots[0].y]) #should return true because it was a valid move
 def testMakeMoveInvalidInBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
-	assert not bm.makeMove(0, bm.roots[0].ID, 25 + bm.roots[0].x, 25 + bm.roots[0].y) #should return false because it was an invalid move because it was too far
+	assert not bm.makeMove(0, bm.roots[0].ID, [bm.roots[0].x,bm.roots[0].y,25 + bm.roots[0].x, 25 + bm.roots[0].y]) #should return false because it was an invalid move because it was too far
 def testMakeMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':2})
 	bm.roots[0].x = 1
-	assert not bm.makeMove(0, 0, -2 + bm.roots[0].x, bm.roots[0].y) #should return false because it was an invalid move becuase it went outside the playing area
+	assert not bm.makeMove(0, 0, [bm.roots[0].x,bm.roots[0].y,-2 + bm.roots[0].x,bm.roots[0].y]) #should return false because it was an invalid move becuase it went outside the playing area
 def testMakeMoveValidKills():
 	#numChildren is set to ensure that the bm doesn't go into 'gameover' state when victim dies. 
 	#As of jan 13 2016 that behavior isn't implemented yet, but hopefully it will be one day.
@@ -45,15 +45,12 @@ def testMakeMoveValidKills():
 	victimID = bm.roots[0].children[list(bm.roots[0].children.keys())[0]].ID
 	killerID = bm.roots[1].children[list(bm.roots[1].children.keys())[1]].ID
 
-	bm.makeMove(1, killerID, bm.roots[0].x + 1, bm.roots[0].y)
+	bm.makeMove(1, killerID, [bm.roots[0].x,bm.roots[0].y,1 + bm.roots[0].x, bm.roots[0].y])
 
 	assert victimID not in list(bm.roots[0].children.keys())
 
 #test the _applyMove function
-def test_ApplyMove():
-	bm = BoardManager(1000, 1000, {'startDepth':1})
-	bm._applyMove(bm.roots[0], -1, -2) #wouldn't be allowed if there was error checking
-	assert bm.roots[0].x == -1 and bm.roots[0].y == -2
+
 def test_ApplyMoveMidpointAdjustment():
 	bm = BoardManager(1000, 1000, {'startDepth':1, 'numChildren':1})
 	ID = list(bm.roots[0].children.values())[0].ID
@@ -63,13 +60,13 @@ def test_ApplyMoveMidpointAdjustment():
 	#test the isValidMove function
 def testIsValidMoveValid():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
-	assert bm.isValidMove(1, bm.roots[1].ID, bm.roots[1].x + 1, bm.roots[1].y + 1)
+	assert bm.isValidMove([bm.roots[0].x,bm.roots[0].y,1 + bm.roots[0].x, 1 + bm.roots[0].y])
 def testIsValidMoveInvalidTooFar():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
-	assert not bm.isValidMove(1, bm.roots[1].ID, bm.roots[1].x + 10000, bm.roots[1].y + 10000)
+	assert not bm.isValidMove([bm.roots[0].x,bm.roots[0].y,100000 + bm.roots[0].x, 100000 + bm.roots[0].y])
 def testIsValidMoveInvalidOutOfBounds():
 	bm = BoardManager(1000, 1000, {'startDepth':1})
-	assert not bm.isValidMove(1, bm.roots[1].ID, -100, bm.roots[1].y)
+	assert not bm.isValidMove([bm.roots[0].x,bm.roots[0].y, bm.roots[0].x-1000, bm.roots[0].y])
 
 #test the rotation matrix function
 def testRotMatrixtheq0():
