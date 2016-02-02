@@ -35,19 +35,21 @@ print(*roots,sep='\n')
 
 
 nodet = None
-def updatePos(ID, pos):
+def updatePos(player, pos):
     if nodet:
+        print([nodet.x,nodet.y,pos[0],pos[1]])
+        player["updateMidpoints"](nodet,[nodet.x,nodet.y,pos[0],pos[1]])
         nodet.x = pos[0]
         nodet.y = pos[1]
         
 def main(player,ID):
     event_loop(player,ID)
-    updatePos(ID,pygame.mouse.get_pos())
+    updatePos(player,pygame.mouse.get_pos())
 
 def event_loop(player,ID):
     global nodet
     for event in pygame.event.get():
-        print(event)
+    #    print(event)
         if event.type == pygame.MOUSEBUTTONDOWN:
             player["clicked"] = True
         elif event.type == pygame.MOUSEBUTTONUP:
@@ -73,17 +75,22 @@ def event_loop(player,ID):
                     nodet = None
 #test
 if __name__ == "__main__":
-    board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2, 'maxDistance':50})
+    board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2, 'maxDistance':50, 'numPlayers':1},True)
     u = UI(None)
     board.positionMap = {}
+    
     root = board.buildTree(2,2,board.getNextId())
     board.setIndexes(root,2)
     board.mapXY(root,2)
+    board.addPlayer(0,root)
     u.drawTree(root)
+    board.buildMidpoints(root)
    # board.addPlayer(0,root)
-    print(board.players)
+    
     clock = pygame.time.Clock()
     while 1:
+      #  print(board.players)
+      #  print(board.roots)
         main(board.players[0],0)
         pygame.display.update()
         u.windowSurface.fill(u.WHITE)

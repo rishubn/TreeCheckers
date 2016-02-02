@@ -52,7 +52,7 @@ class BoardManager:
                 self.rotateTree(root, self.rotMatrix(r), center = numpy.array([[boardSizeX/2],[boardSizeY/2]]))
                 self.buildMidpoints(root)
                 self.addPlayer(i,root)
-                self.roots[i] = root
+                #self.roots[i] = root
     
     #@FCC Jan 13 2016
     #assemble a dict of midpoints for easier access during gameplay
@@ -134,7 +134,7 @@ class BoardManager:
         result = self.isValidMove(positions)
         print(result)
         if result:
-            self._applyMove(actingNode.ID, positions)
+            self._applyMove(actingNode, positions)
             #code below commented purely because the functions getKillList, kill, and _killChild are untested. This *should* work just fine.
             killList = self.getKillList(pnum, numpy.array([[positions[2]], [positions[3]]]))
             #if the list is empty, it's False as far as the if statement is concerned
@@ -144,6 +144,7 @@ class BoardManager:
         if not result:
             actingNode.x = positions[0]
             actingNode.y = positions[1]
+            self._applyMove(actingNode,[positions[2],positions[3],positions[0],positions[1]])
             print("invalidmove")
         return result
 
@@ -161,19 +162,24 @@ class BoardManager:
     Takes a node and moves it. Also informs everyone that the board has changed. there is absolutely no error checking here, so only use this if you've done your error checking!
     If you want to make a move with error checking (i.e. only make the move if it's valid) use the makeMove function. 
     '''
-    def _applyMove(self, actingNodeID, positions):
+    # Should this method be renamed?
+    def _applyMove(self, actingNode, positions,parentX = None, parentY = None):
+
         #if the moving node is not a root node, then we need to update the midpoints dict also. 
-        if not (actingNodeID in map(lambda X: X.ID, self.roots)):
+        if not (actingNode.ID in map(lambda X: X.ID, self.roots)):
             #infer the location of the parent
-            parentX = (self.midpoints[actingNodeID][0][0] * 2) - positions[0]
-            parentY = (self.midpoints[actingNodeID][1][0] * 2) - positions[1]
-            self.midpoints[actingNodeID] = numpy.array([[(parentX + positions[2]) / 2], [(parentY + positions[3]) / 2]]) #update the midpoint appropriately
+            if parentX is None and parentY is None:
+                parentX = (self.midpoints[actingNode.ID][0][0] * 2) - positions[0]
+                parentY = (self.midpoints[actingNode.ID][1][0] * 2) - positions[1]
+                self.midpoints[actingNode.ID] = numpy.array([[(parentX + positions[2]) / 2], [(parentY + positions[3]) / 2]]) #update the midpoint appropriately
+                for ids, child in actingNode.children.items():
+                    self._applyMove(child,None,actingNode.x,actingNode.y)
+            else:
+                self.midpoints[actingNode.ID] = numpy.array([[(parentX + actingNode.x) / 2], [(parentY + actingNode.y) / 2]]) #update the midpoint appropriately
 
-        #update the node itself
 
-
-        self.newBoardState = True #notify UI
     
+        
     #returns a list of ids of nodes that will be killed if any node owned by player pnum moves to pos.  
     #pnum is the number of the player who owns the moving node. x and y are the locations the node is moving to. 
     def getKillList(self, pnum, pos):
@@ -250,10 +256,14 @@ class BoardManager:
     def update(self,playerID,nodeID,pos):
         self.makeMove(playerID,nodeID,pos)
 
+    def updateMidpoints(self,node,pos):
+        self._applyMove(node,pos)
+
     def addPlayer(self,ID,root):
         playerExist = False
         try:
             self.players[ID]
         except KeyError:
-            self.players[ID] = {"root": root, "node": None, "update": self.update, "clicked": False}
+            self.players[ID] = {"root": root, "node": None, "updateMidpoints": self.updateMidpoints, "update": self.update, "clicked": False}
+            self.roots[ID] = root
 
