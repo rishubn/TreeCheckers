@@ -52,7 +52,7 @@ class BoardManager:
                 self.rotateTree(root, self.rotMatrix(r), center = numpy.array([[boardSizeX/2],[boardSizeY/2]]))
                 self.buildMidpoints(root)
                 self.addPlayer(i,root)
-                #self.roots[i] = root
+                self.roots[i] = root
     
     #@FCC Jan 13 2016
     #assemble a dict of midpoints for easier access during gameplay
