@@ -176,6 +176,9 @@ class BoardManager:
                     self._applyMove(child,None,actingNode.x,actingNode.y)
             else:
                 self.midpoints[actingNode.ID] = numpy.array([[(parentX + actingNode.x) / 2], [(parentY + actingNode.y) / 2]]) #update the midpoint appropriately
+        else:
+            for ids,child in actingNode.children.items():
+                self._applyMove(child,None,actingNode.x,actingNode.y)
 
 
     

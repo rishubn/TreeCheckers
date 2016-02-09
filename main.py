@@ -55,9 +55,13 @@ def event_loop(player,ID):
         elif event.type == pygame.MOUSEBUTTONUP:
             player["clicked"] = False
             if nodet:
+                #dont ask why these assignments work - @RN 
+                player["node"][0] = nodet.x
+                player["node"][1] = nodet.y
                 player["node"][2] = nodet.x
                 player["node"][3] = nodet.y
                 player["update"](ID,nodet.ID,player["node"])
+                print("test")
                 print(player)
             nodet = None
         elif event.type == QUIT:
