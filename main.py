@@ -4,47 +4,25 @@ import pygame, sys
 from pygame.locals import *
 import random
 
-#this is a convenient pair of functions for printing the board state to console. 
-#use if you want some debug info
-def debugPrintBoardInfo(bm):
-	for i in range(0, len(bm.roots)):
-		print ("--------------------\n" +
-		  	   "--------------------\n" +
-		   	   "--------------------\n" +
-		   	   "Player {0}:\n".format(i))
-		debugPrintHelper(bm.roots[i])
-
-def debugPrintHelper(root, formatString = ""):
-	print("""{0}ID: {1}\n
-			 {0}x: {2}\n
-			 {0}y: {3}\n""".format(formatString, root.ID if root.ID else "None", 
-												 root.x if root.x else "None", 
-												 root.y if root.y else "None"))
-	for childID in root.children:
-		debugPrintHelper(root.getChild(childID), formatString = formatString + "\t")
-
-"""
-#generate 10 roots at random xy's
-roots = list()
-for x in range(0,10):
-    roots.append((random.randint(0,800),random.randint(0,600)))
-
-#print their coordinates
-print(*roots,sep='\n')
-"""
 
 
 nodet = None
+board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2, 'maxDistance':50, 'numPlayers':1},True)
+u = UI(None)
+def drawOutline(player):
+    if player["clicked"] == True and nodet is not None:
+        u.drawCircles(player["node"][0],player["node"][1],100)
 def updatePos(player, pos):
     if nodet:
         print([nodet.x,nodet.y,pos[0],pos[1]])
         player["updateMidpoints"](nodet,[nodet.x,nodet.y,pos[0],pos[1]])
         nodet.x = pos[0]
         nodet.y = pos[1]
-        
+
 def main(player,ID):
     event_loop(player,ID)
     updatePos(player,pygame.mouse.get_pos())
+    drawOutline(player)
 
 def event_loop(player,ID):
     global nodet
@@ -55,9 +33,9 @@ def event_loop(player,ID):
         elif event.type == pygame.MOUSEBUTTONUP:
             player["clicked"] = False
             if nodet:
-                #dont ask why these assignments work - @RN 
-                player["node"][0] = nodet.x
-                player["node"][1] = nodet.y
+                #dont ask why these assignments work - @RN
+                #player["node"][0] = nodet.x
+                #player["node"][1] = nodet.y
                 player["node"][2] = nodet.x
                 player["node"][3] = nodet.y
                 player["update"](ID,nodet.ID,player["node"])
@@ -82,7 +60,7 @@ if __name__ == "__main__":
     board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2, 'maxDistance':50, 'numPlayers':1},True)
     u = UI(None)
     board.positionMap = {}
-    
+
     root = board.buildTree(2,2,board.getNextId())
     board.setIndexes(root,2)
     board.mapXY(root,2)
@@ -90,7 +68,7 @@ if __name__ == "__main__":
     u.drawTree(root)
     board.buildMidpoints(root)
    # board.addPlayer(0,root)
-    
+
     clock = pygame.time.Clock()
     while 1:
       #  print(board.players)
@@ -98,22 +76,6 @@ if __name__ == "__main__":
         main(board.players[0],0)
         pygame.display.update()
         u.windowSurface.fill(u.WHITE)
-        u.drawTree(board.players[0]["root"]) 
+        u.drawTree(board.players[0]["root"])
         u.drawMidpoints(board.midpoints)
         clock.tick(60)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

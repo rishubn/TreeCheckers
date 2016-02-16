@@ -12,7 +12,7 @@ class BoardManager:
     players = {}
     #flags
     newBoardState = False
-    
+
     #config settings
     maxDistance = -1
     distanceMetric = ''
@@ -26,7 +26,7 @@ class BoardManager:
     def __init__(self, boardSizeX, boardSizeY, configs = {}, testing_mode = False):
         self.boardSizeX = int(boardSizeX)
         self.boardSizeY = int(boardSizeY)
-        
+
         #interpret configs dict
         self.maxDistance = configs.get('maxDistance', 25)
         self.distanceMetric = configs.get('distanceMetric', 'euclidean').lower()
@@ -43,7 +43,7 @@ class BoardManager:
             self.killRadius = 0.1
         if not testing_mode:
             for i in range(0, self.numPlayers):
-                #build board for player 
+                #build board for player
                 self.positionMap = {} #must be before buildTree is called
                 root = self.buildTree(self.depth, self.numChildren, self.getNextId())
                 self.setIndexes(root, self.numChildren)
@@ -53,7 +53,7 @@ class BoardManager:
                 self.buildMidpoints(root)
                 self.addPlayer(i,root)
                 self.roots[i] = root
-    
+
     #@FCC Jan 13 2016
     #assemble a dict of midpoints for easier access during gameplay
     def buildMidpoints(self, root):
@@ -61,7 +61,7 @@ class BoardManager:
             self.midpoints[childID] = numpy.array([[(root.children[childID].x + root.x) / 2], [(root.children[childID].y + root.y) / 2]])
             self.buildMidpoints(root.children[childID])
 
-    #root should be a Node, theta should be a float (in radians) and center should be a 
+    #root should be a Node, theta should be a float (in radians) and center should be a
     def rotateTree(self, root, rm, center = numpy.array([[0],[0]])):
         root.loc = rm.dot(root.loc - center) + center
         for childID in root.children:
@@ -72,7 +72,7 @@ class BoardManager:
     def rotMatrix(self, theta):
         return numpy.array([[math.cos(theta), -1 * math.sin(theta)],
                             [math.sin(theta),      math.cos(theta)]])
-        
+
     # @FCC Jan 4 2016
     # Recursively builds tree, IDs in preorder
     def buildTree(self,depth, numChildren, lastid):
@@ -89,7 +89,6 @@ class BoardManager:
     # index = parentindex * numchildren - lateral position in tree
     # split into two loops, one to set indexes of a node's children, the second to traverse the tree
     # Ask Rishub for more information if confused
-    # TODO write tests for this method
     def setIndexes(self,root,numChildren,parentindex=None):
         if root:
             if self.positionMap[root.ID][0] == 0 and self.positionMap[root.ID][1] == -1:
@@ -104,7 +103,7 @@ class BoardManager:
 
             for ids,child in root.children.items():
                 self.setIndexes(child,numChildren,self.positionMap[child.ID][1])
-    
+
     # @RN Jan 5 2016
     # maps positionMap to X and Ys relative to the board size for N children in a tree
     # ask Rishub for more info
@@ -117,9 +116,9 @@ class BoardManager:
             actingNode = root.getNode(ids)
             actingNode.x = x
             actingNode.y = y+10
-    
+
     ''' Takes the number of the player that owns the node being moved, the id of the node being moved, its new x location and its new y location
-      returns True if the move was valid and False if it was invalid. 
+      returns True if the move was valid and False if it was invalid.
       if the move is valid, updates the board and sets the newBoardState flag to True
     '''
     def makeMove(self, pnum, nodeId, positions):
@@ -134,7 +133,7 @@ class BoardManager:
         result = self.isValidMove(positions)
         print(result)
         if result:
-            self._applyMove(actingNode, positions)
+            self._applyMove(actingNode, [positions[0],positions[1],positions[0],positions[1]])
             #code below commented purely because the functions getKillList, kill, and _killChild are untested. This *should* work just fine.
             killList = self.getKillList(pnum, numpy.array([[positions[2]], [positions[3]]]))
             #if the list is empty, it's False as far as the if statement is concerned
@@ -148,24 +147,24 @@ class BoardManager:
             print("invalidmove")
         return result
 
-    
+
     #Takes a node, and where it might be moved to, and checks if the move is valid. Returns True if it is, False otherwise
     def isValidMove(self, positions):
         print(self.getDistance(positions[0],positions[1],positions[2],positions[3]))
-        return (positions[2] >= 0 and 
-                positions[3] >= 0 and 
-                positions[2] <= self.boardSizeX+1000 and 
-                positions[3] <= self.boardSizeY+1000 and 
+        return (positions[2] >= 0 and
+                positions[3] >= 0 and
+                positions[2] <= self.boardSizeX+1000 and
+                positions[3] <= self.boardSizeY+1000 and
                 self.getDistance(positions[0],positions[1],positions[2],positions[3]) <= self.maxDistance)
 
     '''
     Takes a node and moves it. Also informs everyone that the board has changed. there is absolutely no error checking here, so only use this if you've done your error checking!
-    If you want to make a move with error checking (i.e. only make the move if it's valid) use the makeMove function. 
+    If you want to make a move with error checking (i.e. only make the move if it's valid) use the makeMove function.
     '''
     # Should this method be renamed?
     def _applyMove(self, actingNode, positions,parentX = None, parentY = None):
 
-        #if the moving node is not a root node, then we need to update the midpoints dict also. 
+        #if the moving node is not a root node, then we need to update the midpoints dict also.
         if not (actingNode.ID in map(lambda X: X.ID, self.roots)):
             #infer the location of the parent
             if parentX is None and parentY is None:
@@ -181,12 +180,12 @@ class BoardManager:
                 self._applyMove(child,None,actingNode.x,actingNode.y)
 
 
-    
-        
-    #returns a list of ids of nodes that will be killed if any node owned by player pnum moves to pos.  
-    #pnum is the number of the player who owns the moving node. x and y are the locations the node is moving to. 
+
+
+    #returns a list of ids of nodes that will be killed if any node owned by player pnum moves to pos.
+    #pnum is the number of the player who owns the moving node. x and y are the locations the node is moving to.
     def getKillList(self, pnum, pos):
-        r = [] 
+        r = []
         for i in range(0, len(self.roots)):
             if i != pnum:
                 output = self.roots[i].filterNodes(filterFunc = lambda X: self.getDistance(X.x, X.y, pos[0], pos[1]) <= self.killRadius)
@@ -238,7 +237,7 @@ class BoardManager:
         #location on the x axis where the two lines intersect
         x = (vicIntercept - kilIntercept) / (kilSlope - vicSlope)
 
-        return x >= xInterval[0] and x <= xInterval[1] 
+        return x >= xInterval[0] and x <= xInterval[1]
     """
     def getNextId(self):
         self._next_id += 1
@@ -269,4 +268,3 @@ class BoardManager:
         except KeyError:
             self.players[ID] = {"root": root, "node": None, "updateMidpoints": self.updateMidpoints, "update": self.update, "clicked": False}
             self.roots[ID] = root
-

@@ -17,13 +17,9 @@ class UI:
         self.windowSurface = pygame.display.set_mode((800,600),0,32) #make 800x600 window
         self.windowSurface.fill(self.WHITE)
         pygame.display.update()  #draw the empty window
-        
-    def drawCircles(self):
-        self.printed = set()
-        self.printed.add(self.p1Node)
-        self.drawTeamCircles(self.p1Node)
-        self.printed.add(self.p2Node)
-        self.drawTeamCircles(self.p2Node)        
+
+    def drawCircles(self,x,y,radius):
+        pygame.draw.arc(self.windowSurface,self.RED,(x-radius/2,y-radius/2,radius,radius),0,6.28,2);       
 
     def drawTree(self,root):
         if root:
@@ -31,7 +27,7 @@ class UI:
             for id,child in root.children.items():
                 pygame.draw.line(self.windowSurface,self.RED,(math.floor(root.x),math.floor(root.y)),(math.floor(child.x),math.floor(child.y)),2)
                 self.drawTree(child)
-   
+
     def drawMidpoints(self,midpoints):
         if midpoints:
             for i in midpoints:
@@ -54,8 +50,3 @@ class UI:
 
         #set new board
         self.roots = newRoots
-
-
-            
-
-    
