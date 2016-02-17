@@ -5,6 +5,7 @@ class BoardManager:
     boardSizeX = None
     boardSizeY = None
     _next_id = -1
+    _next_player_id = -1
     midpoints = {} #every node except root should have one entry in this dict, key ID, value tuple containing x midpoint, y midpoint.
     roots = []
     #maps node ID to depth and index array
@@ -111,8 +112,8 @@ class BoardManager:
         for ids, positions in self.positionMap.items():
             depth = positions[0]
             index = positions[1]
-            x = index * self.boardSizeX / (numChildren ** depth +1)
-            y = depth * self.boardSizeY / self.depth
+            x = index * (self.boardSizeX) / (numChildren ** depth +1)
+            y = depth * (self.boardSizeY/2 - 50) / self.depth
             actingNode = root.getNode(ids)
             actingNode.x = x
             actingNode.y = y+10
@@ -268,3 +269,15 @@ class BoardManager:
         except KeyError:
             self.players[ID] = {"root": root, "node": None, "updateMidpoints": self.updateMidpoints, "update": self.update, "clicked": False}
             self.roots[ID] = root
+
+    def buildPlayer(self):
+        self.positionMap = {}
+        root = self.buildTree(self.depth,self.numChildren,self.getNextId())
+        self.setIndexes(root,self.numChildren)
+        self.mapXY(root,self.numChildren)
+        self._next_player_id += 1
+        if(self._next_player_id == 1):
+            r = math.pi
+            self.rotateTree(root, self.rotMatrix(r), center = numpy.array([[self.boardSizeX/2],[self.boardSizeY/2]]))
+        self.buildMidpoints(root) 
+        self.addPlayer(self._next_player_id,root)
