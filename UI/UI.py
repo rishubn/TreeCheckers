@@ -3,7 +3,8 @@ from pygame.locals import *
 
 class UI:
     #fields
-    roots = []
+    boardSizeX = 0
+    boardSizeY = 0
     windowSurface = None
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -11,21 +12,22 @@ class UI:
     GREEN = (0, 255, 0)
     BLUE = (0, 0, 255)
 
-    def __init__(self, roots):
+    def __init__(self, x,y):
         pygame.init()
-        self.roots = roots
-        self.windowSurface = pygame.display.set_mode((800,600),0,32) #make 800x600 window
+        self.boardSizeX = x
+        self.boardSizeY = y
+        self.windowSurface = pygame.display.set_mode((self.boardSizeX,self.boardSizeY),0,32) #make 800x600 window
         self.windowSurface.fill(self.WHITE)
         pygame.display.update()  #draw the empty window
 
-    def drawCircles(self,x,y,radius):
-        pygame.draw.arc(self.windowSurface,self.RED,(x-radius/2,y-radius/2,radius,radius),0,6.28,2);       
+    def drawCircles(self,x,y,diameter):
+        pygame.draw.arc(self.windowSurface,self.RED,(x-diameter/2,y-diameter/2,diameter,diameter),0,6.28,2);       
 
     def drawTree(self,root):
         if root:
             pygame.draw.circle(self.windowSurface,self.BLUE,(math.floor(root.x),math.floor(root.y)),5,0)
             for id,child in root.children.items():
-                pygame.draw.line(self.windowSurface,self.RED,(math.floor(root.x),math.floor(root.y)),(math.floor(child.x),math.floor(child.y)),2)
+                pygame.draw.aaline(self.windowSurface,self.RED,(math.floor(root.x),math.floor(root.y)),(math.floor(child.x),math.floor(child.y)),2)
                 self.drawTree(child)
 
     def drawMidpoints(self,midpoints):
@@ -34,19 +36,3 @@ class UI:
                 root = midpoints[i]
                 pygame.draw.circle(self.windowSurface,self.GREEN,(math.floor(root[0][0]),math.floor(root[1][0])),3,0)
 
-    """
-    Draws all the circles below the given Node. If the given node is the root of a team, this function will draw every node on that team.
-    """
-    def drawTeamCircles(self, root):
-        pygame.draw.circle(self.windowSurface, self.BLUE, (math.floor(root.x), math.floor(root.y)),2,0)
-        pygame.display.update() #perhaps update should just be called once, at the end of this method? -Forrest Dec 29 2015
-        for childID in root.children:
-            if childID not in self.printed:
-                self.printed.add(childID)
-                self.drawTeamCircles(root.getChild(childID))
-
-    def updateBoard(self, newRoots):
-        #play animations and whatnot as approprate
-
-        #set new board
-        self.roots = newRoots

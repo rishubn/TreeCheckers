@@ -7,8 +7,15 @@ import random
 
 
 nodet = None
-board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2, 'maxDistance':50, 'numPlayers':1},True)
-u = UI(None)
+board = None
+u = None
+
+def init():
+    global board
+    global u
+    board = BoardManager(800, 300, {'startDepth':2, 'numChildren':2, 'maxDistance':50, 'numPlayers':1},True)
+    u = UI(800,600)
+
 def drawOutline(player):
     if player["clicked"] == True and nodet is not None:
         u.drawCircles(player["node"][0],player["node"][1],100)
@@ -57,8 +64,7 @@ def event_loop(player,ID):
                     nodet = None
 #test
 if __name__ == "__main__":
-    board = BoardManager(100, 100, {'startDepth':2, 'numChildren':2, 'maxDistance':50, 'numPlayers':1},True)
-    u = UI(None)
+    init()
     board.positionMap = {}
 
     root = board.buildTree(2,2,board.getNextId())
