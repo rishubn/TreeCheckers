@@ -51,11 +51,6 @@ def testMakeMoveValidKills():
 
 #test the _applyMove function
 
-def test_ApplyMoveMidpointAdjustment():
-	bm = BoardManager(1000, 1000, {'startDepth':1, 'numChildren':1})
-	ID = list(bm.roots[0].children.values())[0].ID
-	bm._applyMove(list(bm.roots[0].children.values())[0], -1, -2) #wouldn't be allowed if there was error checking
-	assert numpy.array_equal(bm.midpoints[ID], numpy.array([[(bm.roots[0].x + -1) / 2], [(bm.roots[0].y + -2) / 2]]))
 
 	#test the isValidMove function
 def testIsValidMoveValid():
