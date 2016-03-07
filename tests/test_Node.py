@@ -51,7 +51,7 @@ def testXSetterWithLoc():
 	print (n0.loc)
 	assert n0.loc[0][0] == 1
 #test the .y property setter
-def testYSetterWithXGetter():
+def testYSetterWithYGetter():
 	n0 = Node(0, 0, 0)
 	n0.y = 1
 	assert n0.y == 1

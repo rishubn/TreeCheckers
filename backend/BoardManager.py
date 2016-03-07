@@ -159,7 +159,7 @@ class BoardManager:
                 self.getDistance(positions[0],positions[1],positions[2],positions[3]) <= self.maxDistance)
 
     '''
-    Takes a node and moves it. Also informs everyone that the board has changed. there is absolutely no error checking here, so only use this if you've done your error checking!
+    Takes a node and moves it. Also informs everyone that the board has changed. there is absolutely no error checking here, so only use this if you've done your error ch  ecking!
     If you want to make a move with error checking (i.e. only make the move if it's valid) use the makeMove function.
     '''
     # Should this method be renamed?
@@ -187,11 +187,15 @@ class BoardManager:
     #pnum is the number of the player who owns the moving node. x and y are the locations the node is moving to.
     def getKillList(self, pnum, pos):
         r = []
-        for i in range(0, len(self.roots)):
-            if i != pnum:
-                output = self.roots[i].filterNodes(filterFunc = lambda X: self.getDistance(X.x, X.y, pos[0], pos[1]) <= self.killRadius)
-                output = map(lambda X: X.ID, output)
-                r.extend(output)
+        for ID in self.midpoints:
+            if self.getDistance(self.midpoints[ID][0][0], self.midpoints[ID][1][0], pos[0], pos[1]) <= self.killRadius:
+                if self.roots[pnum].getNode(ID) is None: #if the node we found isn't owned by the player who's moving:
+                    r.append(ID)
+        #for i in range(0, len(self.roots)):
+        #    if i != pnum:
+        #        output = self.roots[i].filterNodes(filterFunc = lambda X: self.getDistance(X.x, X.y, pos[0], pos[1]) <= self.killRadius)
+        #        output = map(lambda X: X.ID, output)
+        #        r.extend(output)
         return r
 
     #warning: this function will immediately kill the specified node (if it exists), no matter what.
@@ -208,6 +212,9 @@ class BoardManager:
     #don't use it unless you're sure the node in question must die!
     def _killChild(self, ID, root):
         if ID in root.children:
+            #apologies for the python type conversion voodoo. This is still constant time, right?
+            for childID in list((root.children[ID].children).keys()): #for each child in the list of children of the node that is going to die:
+                self._killChild(childID, root.children[ID])
             del root.children[ID]
             del self.midpoints[ID]
             return None #exit since we're done here
