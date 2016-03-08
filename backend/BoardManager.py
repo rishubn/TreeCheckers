@@ -173,8 +173,8 @@ class BoardManager:
         print(self.getDistance(positions[0],positions[1],positions[2],positions[3]))
         return (positions[2] >= 0 and
                 positions[3] >= 0 and
-                positions[2] <= self.boardSizeX+1000 and
-                positions[3] <= self.boardSizeY+1000 and
+                positions[2] <= self.boardSizeX and
+                positions[3] <= self.boardSizeY and
                 self.getDistance(positions[0],positions[1],positions[2],positions[3]) <= self.maxDistance)
 
     '''

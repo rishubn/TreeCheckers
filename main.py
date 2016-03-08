@@ -45,6 +45,8 @@ def event_loop(player,ID):
                 player["node"][3] = nodet.y
                 player["update"](ID,nodet.ID,player["node"])
                 p1Move = not p1Move
+                if not board.isValidMove(player["node"]):
+                    p1Move = not p1Move
             nodet = None
         elif event.type == QUIT:
             pygame.quit()
