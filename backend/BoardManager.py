@@ -15,6 +15,7 @@ class BoardManager:
     newBoardState = False
     randoms = []
     randomSeed = ''
+    isRandom = False
     #config settings
     maxDistance = -1
     distanceMetric = ''
@@ -37,6 +38,7 @@ class BoardManager:
         self.numPlayers = int(configs.get('numPlayers', 2))
         self.killRadius = int(configs.get('killRadius', 10))
         self.randomSeed = str(configs.get('seed',seed))
+        self.isRandom = bool(configs.get('isRandom',False))
         print('Your seed is: ' + self.randomSeed)
         self.roots = [None] * self.numPlayers
         if self.depth < 1:
@@ -45,9 +47,12 @@ class BoardManager:
             self.numChildren = 1
         if self.killRadius < 0:
             self.killRadius = 0.1
-        totalNodes = (self.numChildren ** (self.depth+1)-1)/(self.numChildren-1)
-        random.seed(self.randomSeed)
-        self.randoms = [random.uniform(-50,50) for _ in range(0,int(totalNodes))]
+        if self.isRandom:
+            totalNodes = self.depth
+            if self.numChildren != 1:
+                totalNodes = (self.numChildren ** (self.depth+1)-1)/(self.numChildren-1)
+            random.seed(self.randomSeed)
+            self.randoms = [random.uniform(-50,50) for _ in range(0,int(totalNodes))]
         if not testing_mode:
             for i in range(0, self.numPlayers):
                 #build board for player
@@ -79,7 +84,7 @@ class BoardManager:
     def rotMatrix(self, theta):
         return numpy.array([[math.cos(theta), -1 * math.sin(theta)],
                             [math.sin(theta),      math.cos(theta)]])
-    
+
     #Radians,
     #reflects matrix
     #@RN March 8 2016
@@ -125,11 +130,13 @@ class BoardManager:
             x = index * (self.boardSizeX) / (numChildren ** depth +1)
             y = depth * (self.boardSizeY/2 - 50) / self.depth
             actingNode = root.getNode(ids)
-            actingNode.x = x + positions[2]
+            actingNode.x = x
             actingNode.y = y+10
-            if depth != 0:
-                actingNode.y += (positions[2] /2)
-    
+            if self.isRandom:
+                actingNode.x += positions[2]
+                if depth != 0:
+                    actingNode.y += (positions[2] /2)
+
     # @RN March 08 2016
     # Appends randoms to positionMap for use in MapXY
     def randomize(self):
@@ -300,12 +307,13 @@ class BoardManager:
         self.positionMap = {}
         root = self.buildTree(self.depth,self.numChildren,self.getNextId())
         self.setIndexes(root,self.numChildren)
-        self.randomize()
+        if self.isRandom:
+            self.randomize()
         self.mapXY(root,self.numChildren)
         self._next_player_id += 1
         if(self._next_player_id == 1):
             r = math.pi
             self.rotateTree(root, self.rotMatrix(r), center = numpy.array([[self.boardSizeX/2],[self.boardSizeY/2]]))
             self.rotateTree(root, self.refMatrix(r/2), center = numpy.array([[self.boardSizeX/2],[self.boardSizeY/2]]))
-        self.buildMidpoints(root) 
+        self.buildMidpoints(root)
         self.addPlayer(self._next_player_id,root)
