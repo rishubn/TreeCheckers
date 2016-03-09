@@ -5,7 +5,7 @@ from pygame.locals import *
 import random
 
 
-# oh no global variables!! 
+# oh no global variables!!
 nodet = None
 board = None
 u = None
@@ -14,8 +14,9 @@ p1Move = True
 def init():
     global board
     global u
-    board = BoardManager(800, 600, {'startDepth':2, 'numChildren':3, 'maxDistance':50, 'numPlayers':2},True)
-    u = UI(800,600)
+    u = UI()
+    board = BoardManager(800, 600, {'startDepth':u.configs['depth'], 'numChildren':u.configs['numChildren'], 'maxDistance':50, 'numPlayers':2,'isRandom':u.configs['randomize']},True)
+
 
 def drawOutline(player):
     if player["clicked"] == True and nodet is not None:
