@@ -1,4 +1,4 @@
-import pygame, sys, math, os
+import pygame, sys, math, os, pgu
 from pygame.locals import *
 from pgu import gui
 
@@ -59,8 +59,7 @@ class UI:
             try:
                 configs['width'] = int(e.value)
             except:
-                e.value = '800'
-                configs['width'] = int(e.value)
+                configs['width'] = 800
         width.connect(gui.CHANGE,callback,width)
         c.td(width,colspan=3)
         #initialize height box
@@ -72,8 +71,7 @@ class UI:
             try:
                 configs['height'] = int(e.value)
             except:
-                e.value = '600'
-                configs['height'] = int(e.value)
+                configs['height'] = 600
         height.connect(gui.CHANGE,callback,height)
         c.td(height,colspan=3)
         #Intialize depth select box
