@@ -15,7 +15,7 @@ def init():
     global board
     global u
     u = UI()
-    board = BoardManager(800, 600, {'startDepth':u.configs['depth'], 'numChildren':u.configs['numChildren'], 'maxDistance':50, 'numPlayers':2,'isRandom':u.configs['randomize']},True)
+    board = BoardManager(u.configs['width'], u.configs['height'], {'startDepth':u.configs['depth'], 'numChildren':u.configs['numChildren'], 'maxDistance':50, 'numPlayers':2,'isRandom':u.configs['randomize']},True)
 
 
 def drawOutline(player):
@@ -23,7 +23,6 @@ def drawOutline(player):
         u.drawCircles(player["node"][0],player["node"][1],board.maxDistance*2)
 def updatePos(player, pos):
     if nodet:
-        print([nodet.x,nodet.y,pos[0],pos[1]])
         player["updateMidpoints"](nodet,[nodet.x,nodet.y,pos[0],pos[1]])
         nodet.x = pos[0]
         nodet.y = pos[1]
