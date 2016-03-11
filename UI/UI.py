@@ -49,7 +49,7 @@ class UI:
         icon = pygame.image.load(os.path.join('assets','icon.png'))
         pygame.display.set_icon(icon)
         pygame.display.set_caption('TreeCheckers')
-        c = gui.Table()
+        c = gui.Table(width=400,height=300)
         #Intialize width box
         c.tr()
         c.td(gui.Label("Screen Width"))
