@@ -159,10 +159,9 @@ class BoardManager:
                 self.getDistance(positions[0],positions[1],positions[2],positions[3]) <= self.maxDistance)
 
     '''
-    Takes a node and moves it. Also informs everyone that the board has changed. there is absolutely no error checking here, so only use this if you've done your error ch  ecking!
+    Takes a node and moves it. Also informs everyone that the board has changed. there is absolutely no error checking here, so only use this if you've done your error checking!
     If you want to make a move with error checking (i.e. only make the move if it's valid) use the makeMove function.
     '''
-    # Should this method be renamed?
     def _applyMove(self, actingNode, positions,parentX = None, parentY = None):
 
         #if the moving node is not a root node, then we need to update the midpoints dict also.

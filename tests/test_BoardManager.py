@@ -38,15 +38,10 @@ def testMakeMoveValidKills():
 	#As of jan 13 2016 that behavior isn't implemented yet, but hopefully it will be one day.
 	bm = BoardManager(1000, 1000, {'startDepth':1, 'maxDistance': 100000, 'numChildren': 2})
 
-	#positioning the victim conveniently
-	#bypassing the move function becuase it's easier to avoid making an invalid move
-	bm.roots[0].children[list(bm.roots[0].children.keys())[0]].x = bm.roots[0].x + 2
-	bm.roots[0].children[list(bm.roots[0].children.keys())[0]].y = bm.roots[0].y
 	victimID = bm.roots[0].children[list(bm.roots[0].children.keys())[0]].ID
-	killerID = bm.roots[1].children[list(bm.roots[1].children.keys())[1]].ID
+	killerID = bm.roots[1].children[list(bm.roots[1].children.keys())[0]].ID
 
-	bm.makeMove(1, killerID, [bm.roots[0].x,bm.roots[0].y,1 + bm.roots[0].x, bm.roots[0].y])
-
+	bm.makeMove(1, killerID, [bm.roots[0].x,bm.roots[0].y,bm.midpoints[victimID][0][0], bm.midpoints[victimID][1][0]])
 	assert victimID not in list(bm.roots[0].children.keys())
 
 #test the _applyMove function
