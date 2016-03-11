@@ -2,22 +2,22 @@ import pytest, math, numpy
 from backend.Node import Node
 from backend.BoardManager import BoardManager
 
-#this is a helper function for comparing two floating point numbers. 
+#this is a helper function for comparing two floating point numbers.
 #probably already exists somewhere but it's so simple we just rewrote it here
 def tolerantEquals(a, b, tol):
 	return abs(a - b) <= tol
 
 #test the getDistance Function
 def testGetDistanceStraightlineEuclidean():
-	bm = BoardManager(1000, 1000, {'startDepth':2, 'distanceMetric':'euclidean'})
+	bm = BoardManager(1000, 1000, {'startDepth':2, 'distanceMetric':'euclidean'},True)
 	assert tolerantEquals(bm.getDistance(0, 0, 0, 1), 1, 0.001)
 def testGetDistanceDiagonalEuclidean():
-	bm = BoardManager(1000, 1000, {'startDepth':2, 'distanceMetric':'euclidean'})
+	bm = BoardManager(1000, 1000, {'startDepth':2, 'distanceMetric':'euclidean'},True)
 	assert tolerantEquals(bm.getDistance(0, 0, 1, 1), math.sqrt(2), 0.001)
 
 #test the getNodeDistance convenience function
 def testGetNodeDistanceEuclidean():
-	bm = BoardManager(1000, 1000, {'startDepth':2, 'distanceMetric':'euclidean'})
+	bm = BoardManager(1000, 1000, {'startDepth':2, 'distanceMetric':'euclidean'},True)
 	n0 = Node(0, 0, 0)
 	n1 = Node(1, 1, 1)
 	assert tolerantEquals(bm.getNodeDistance(n0, n1), math.sqrt(2), 0.001)
@@ -34,7 +34,7 @@ def testMakeMoveInvalidOutOfBounds():
 	bm.roots[0].x = 1
 	assert not bm.makeMove(0, 0, [bm.roots[0].x,bm.roots[0].y,-2 + bm.roots[0].x,bm.roots[0].y]) #should return false because it was an invalid move becuase it went outside the playing area
 def testMakeMoveValidKills():
-	#numChildren is set to ensure that the bm doesn't go into 'gameover' state when victim dies. 
+	#numChildren is set to ensure that the bm doesn't go into 'gameover' state when victim dies.
 	#As of jan 13 2016 that behavior isn't implemented yet, but hopefully it will be one day.
 	bm = BoardManager(1000, 1000, {'startDepth':1, 'maxDistance': 100000, 'numChildren': 2})
 
@@ -125,17 +125,19 @@ def testGetKillListEmpty():
 def testSetIndexesValidIndex():
     depth = 3
     children = 3
-    bm = BoardManager(1000,1000, {'startDepth':depth, 'numChildren':children})
+    bm = BoardManager(1000,1000, {'startDepth':depth, 'numChildren':children},True)
     tree = bm.buildTree(depth,children,bm.getNextId())
     bm.setIndexes(tree,children)
     for ids, positions in bm.positionMap.items():
-        assert positions[1] != -1 
+        assert positions[1] != -1
 
 def testSetIndexesCorrectIndexAndDepth():
 	depth = 2
 	children = 3
 	bm = BoardManager(1000,1000, {'startDepth':depth, 'numChildren':children},True)
+	bm.positionMap = {}
 	tree = bm.buildTree(depth,children,bm.getNextId())
 	bm.setIndexes(tree,children)
 	pm = bm.positionMap
+	print(pm)
 	assert pm == {0: [0, 1], 1: [1, 1], 2: [2, 1], 3: [2, 2], 4: [2, 3], 5: [1, 2], 6: [2, 5], 7: [2, 6], 8: [2, 4], 9: [1, 3], 10: [2, 7], 11: [2, 8], 12: [2, 9]}

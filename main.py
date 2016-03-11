@@ -5,7 +5,7 @@ from pygame.locals import *
 import random
 
 
-# oh no global variables!! 
+# oh no global variables!!
 nodet = None
 board = None
 u = None
@@ -14,8 +14,9 @@ p1Move = True
 def init():
     global board
     global u
-    board = BoardManager(800, 600, {'startDepth':2, 'numChildren':3, 'maxDistance':50, 'numPlayers':2},True)
-    u = UI(800,600)
+    u = UI()
+    board = BoardManager(800, 600, {'startDepth':u.configs['depth'], 'numChildren':u.configs['numChildren'], 'maxDistance':50, 'numPlayers':2,'isRandom':u.configs['randomize']},True)
+
 
 def drawOutline(player):
     if player["clicked"] == True and nodet is not None:
@@ -45,6 +46,8 @@ def event_loop(player,ID):
                 player["node"][3] = nodet.y
                 player["update"](ID,nodet.ID,player["node"])
                 p1Move = not p1Move
+                if not board.isValidMove(player["node"]):
+                    p1Move = not p1Move
             nodet = None
         elif event.type == QUIT:
             pygame.quit()
@@ -69,7 +72,7 @@ if __name__ == "__main__":
             main(board.players[1],1)
         pygame.display.update()
         u.windowSurface.fill(u.WHITE)
-        u.drawTree(board.players[0]["root"])
-        u.drawTree(board.players[1]["root"])
-        u.drawMidpoints(board.midpoints)
+        u.drawTree(board.players[0]["root"],u.PURPLE,u.RED)
+        u.drawTree(board.players[1]["root"],u.BLUE,u.MAGENTA)
+        u.drawMidpoints(board.midpoints,u.GREEN)
         clock.tick(60)

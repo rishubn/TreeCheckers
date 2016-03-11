@@ -1,4 +1,4 @@
-import math, numpy
+import math, numpy,random,string
 from backend.Node import Node
 
 class BoardManager:
@@ -13,7 +13,9 @@ class BoardManager:
     players = {}
     #flags
     newBoardState = False
-
+    randoms = []
+    randomSeed = ''
+    isRandom = False
     #config settings
     maxDistance = -1
     distanceMetric = ''
@@ -27,7 +29,7 @@ class BoardManager:
     def __init__(self, boardSizeX, boardSizeY, configs = {}, testing_mode = False):
         self.boardSizeX = int(boardSizeX)
         self.boardSizeY = int(boardSizeY)
-
+        seed = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(6))
         #interpret configs dict
         self.maxDistance = configs.get('maxDistance', 25)
         self.distanceMetric = configs.get('distanceMetric', 'euclidean').lower()
@@ -35,6 +37,9 @@ class BoardManager:
         self.depth = int(configs.get('startDepth', 3))
         self.numPlayers = int(configs.get('numPlayers', 2))
         self.killRadius = int(configs.get('killRadius', 10))
+        self.randomSeed = str(configs.get('seed',seed))
+        self.isRandom = bool(configs.get('isRandom',False))
+        print('Your seed is: ' + self.randomSeed)
         self.roots = [None] * self.numPlayers
         if self.depth < 1:
             self.depth = 1
@@ -42,6 +47,12 @@ class BoardManager:
             self.numChildren = 1
         if self.killRadius < 0:
             self.killRadius = 0.1
+        if self.isRandom:
+            totalNodes = self.depth
+            if self.numChildren != 1:
+                totalNodes = (self.numChildren ** (self.depth+1)-1)/(self.numChildren-1)
+            random.seed(self.randomSeed)
+            self.randoms = [random.uniform(-50,50) for _ in range(0,int(totalNodes))]
         if not testing_mode:
             for i in range(0, self.numPlayers):
                 #build board for player
@@ -74,6 +85,12 @@ class BoardManager:
         return numpy.array([[math.cos(theta), -1 * math.sin(theta)],
                             [math.sin(theta),      math.cos(theta)]])
 
+    #Radians,
+    #reflects matrix
+    #@RN March 8 2016
+    def refMatrix(self, theta):
+        return numpy.array([[math.cos(2*theta), math.sin(2*theta)],
+                            [math.sin(2*theta), -1 * math.cos(2*theta)]])
     # @FCC Jan 4 2016
     # Recursively builds tree, IDs in preorder
     def buildTree(self,depth, numChildren, lastid):
@@ -100,8 +117,6 @@ class BoardManager:
                 index = parentindex * numChildren - i
                 self.positionMap[child.ID][1] = index
                 i = i - 1
-                #print("ID: " + str(ids) + " parentindex: " + str(parentindex) + " numChildren: " + str(numChildren) + "index: " + str(index) + " i: " + str(i))
-
             for ids,child in root.children.items():
                 self.setIndexes(child,numChildren,self.positionMap[child.ID][1])
 
@@ -117,7 +132,18 @@ class BoardManager:
             actingNode = root.getNode(ids)
             actingNode.x = x
             actingNode.y = y+10
+            if self.isRandom:
+                actingNode.x += positions[2]
+                if depth != 0:
+                    actingNode.y += (positions[2] /2)
 
+    # @RN March 08 2016
+    # Appends randoms to positionMap for use in MapXY
+    def randomize(self):
+        i = 0
+        for ids, positions in sorted(self.positionMap.items(), key=lambda x:x[1]):
+            self.positionMap[ids] = positions + [self.randoms[i]]
+            i += 1
     ''' Takes the number of the player that owns the node being moved, the id of the node being moved, its new x location and its new y location
       returns True if the move was valid and False if it was invalid.
       if the move is valid, updates the board and sets the newBoardState flag to True
@@ -154,8 +180,8 @@ class BoardManager:
         print(self.getDistance(positions[0],positions[1],positions[2],positions[3]))
         return (positions[2] >= 0 and
                 positions[3] >= 0 and
-                positions[2] <= self.boardSizeX+1000 and
-                positions[3] <= self.boardSizeY+1000 and
+                positions[2] <= self.boardSizeX and
+                positions[3] <= self.boardSizeY and
                 self.getDistance(positions[0],positions[1],positions[2],positions[3]) <= self.maxDistance)
 
     '''
@@ -280,10 +306,13 @@ class BoardManager:
         self.positionMap = {}
         root = self.buildTree(self.depth,self.numChildren,self.getNextId())
         self.setIndexes(root,self.numChildren)
+        if self.isRandom:
+            self.randomize()
         self.mapXY(root,self.numChildren)
         self._next_player_id += 1
         if(self._next_player_id == 1):
             r = math.pi
             self.rotateTree(root, self.rotMatrix(r), center = numpy.array([[self.boardSizeX/2],[self.boardSizeY/2]]))
-        self.buildMidpoints(root) 
+            self.rotateTree(root, self.refMatrix(r/2), center = numpy.array([[self.boardSizeX/2],[self.boardSizeY/2]]))
+        self.buildMidpoints(root)
         self.addPlayer(self._next_player_id,root)
