@@ -10,6 +10,13 @@ The goal of the game is to cut off the opposing player's root node with your tre
 
 ![Screenshot 2](http://i.imgur.com/L2GnICo.jpg)
 
+## Dependancies
+  - pygame (3.4)
+  - numpy
+  - pgu (https://github.com/parogers/pgu)
+  - pytest for tests
+
+
 ## TODO 
   - [x] N-Array B-Trees
   - [x] 4 Player Support
