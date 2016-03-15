@@ -1,4 +1,5 @@
 from backend.BoardManager import BoardManager
+from backend.AI import AI
 from UI.UI import UI
 import pygame, sys
 from pygame.locals import *
@@ -62,7 +63,6 @@ if __name__ == "__main__":
     init()
     board.buildPlayer()
     board.buildPlayer()
-
     clock = pygame.time.Clock()
     while 1:
         if p1Move:
