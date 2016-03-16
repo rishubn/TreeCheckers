@@ -1,5 +1,6 @@
-from backend.Node import Node
+from Node import Node
 import math
+import sys
 class AI:
     root = None
     priorityMap = {} # Assigns weight to each node based on depth and children per node
@@ -31,3 +32,35 @@ class AI:
             for ids, child in root.children.items():
                 self.generateMoveMap(child,radius,degree,segments,radian)
 
+    #returns the value of a move
+    #these nodes are NOT game nodes, they are gamestates. 
+    def minimax(board, depth, pnum):
+        if depth == 0 or len(node.children) == 0:
+            return heuristic(board)
+
+        if pnum == 0: #max
+            bestvalue = sys.float_info.max
+            for move in moveMap: #probably wrong
+                value = minimax(move, depth - 1, 1)
+                bestvalue = max(value, bestvalue)
+        else: #min
+            bestvalue = sys.float_info.min
+            for move in moveMap: #ditto
+                value = minimax(move, depth - 1, 0)
+                bestvalue = min(bestvalue, value)
+        return value
+
+    #bs is a board state (a list of roots)
+    def heuristic(bs):
+        return 0
+
+    #thebs is the current boar state
+    def getMove(thebs, depth, pnum):
+        bestMove = None
+        bestMoveValue = sys.float_info.min
+        for move in moveMap: #might be wrong
+            value = minimax(thebs, depth, pnum)
+            if value >= bestMoveValue:
+                bestMoveValue = value
+                bestMove = move
+        return bestMove
