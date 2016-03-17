@@ -1,5 +1,5 @@
 from backend.BoardManager import BoardManager
-from backend.AI import AI
+import backend.AI as AI
 from UI.UI import UI
 import pygame, sys
 from pygame.locals import *
@@ -16,7 +16,7 @@ def init():
     global board
     global u
     u = UI()
-    board = BoardManager(u.configs['width'], u.configs['height'], {'startDepth':u.configs['depth'], 'numChildren':u.configs['numChildren'], 'maxDistance':50, 'numPlayers':2,'isRandom':u.configs['randomize']},True)
+    board = BoardManager(u.configs['width'], u.configs['height'], {'startDepth':2, 'numChildren':2, 'maxDistance':50, 'numPlayers':2,'isRandom':u.configs['randomize']},True)
 
 
 def drawOutline(player):
@@ -63,6 +63,7 @@ if __name__ == "__main__":
     init()
     board.buildPlayer()
     board.buildPlayer()
+    print(AI.generatePriorityMap(board.players[0]["root"]))
     clock = pygame.time.Clock()
     while 1:
         if p1Move:
