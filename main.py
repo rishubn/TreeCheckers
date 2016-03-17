@@ -16,8 +16,7 @@ def init():
     global board
     global u
     u = UI()
-    board = BoardManager(u.configs['width'], u.configs['height'], {'startDepth':2, 'numChildren':2, 'maxDistance':50, 'numPlayers':2,'isRandom':u.configs['randomize']},True)
-
+    board = BoardManager(u.configs['width'], u.configs['height'], {'startDepth':u.configs['depth'], 'numChildren':u.configs['numChildren'], 'maxDistance':50, 'numPlayers':2,'isRandom':u.configs['randomize']},True)
 
 def drawOutline(player):
     if player["clicked"] == True and nodet is not None:
