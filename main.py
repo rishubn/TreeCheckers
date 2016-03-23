@@ -62,7 +62,6 @@ if __name__ == "__main__":
     init()
     board.buildPlayer()
     board.buildPlayer()
-    print(AI.generatePriorityMap(board.players[0]["root"]))
     clock = pygame.time.Clock()
     while 1:
         if p1Move:

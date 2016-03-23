@@ -1,6 +1,7 @@
 from backend.Node import Node
 import math
 import sys
+import copy
 # @RN March 15 2016
 # Sets priority for each node based on depth / children of node
 # Nodes without children that are lower in the tree are prioritized higher than higher nodes with children
@@ -16,9 +17,9 @@ def generatePriorityMap(root,depth=0,priorityMap={}):
 # Returns map with node.ID as key and a list of tuples of possible moves
 # segmented by an angle
 # Ex: {1: [
-#   (radius*cos(theta),radius*sin(theta)), 
+#   (radius*cos(theta),radius*sin(theta)),
 #   (radius*cos(2*theta),radius*sin(2*theta)),
-#    .... 
+#    ....
 #   (radius*cos(n*theta),radius*sin(n*theta))]}
 # n = 2pi / theta
 def generateMoveMap(root, radius, degree=10,radian=False,segments=0,moveMap={}):
@@ -41,7 +42,7 @@ def generateMoveMap(root, radius, degree=10,radian=False,segments=0,moveMap={}):
 
 
 #returns the value of a move
-#these nodes are NOT game nodes, they are gamestates. 
+#these nodes are NOT game nodes, they are gamestates.
 def minimax(board, depth, pnum):
     if depth == 0 or len(node.children) == 0:
         return heuristic(board)
@@ -62,8 +63,25 @@ def minimax(board, depth, pnum):
 def heuristic(bs):
     return 0
 
+# @RN March 22 2016
+# takes the board state and a node ID and a new location and applies it to the node
+# returns a new board state
+def applyMove(bs, nodeId, location):
+    newBs = copy.deepcopy(bs)
+    for root in newBs:
+        node = root.getNode(nodeId)
+        if node is not None:
+            node.x = location[0]
+            node.y = location[1]
+    return newBs
+
+
+
+
+
+
 #thebs is the current boar state
-def getMove(thebs, depth, pnum):
+def getOptimalMove(thebs, depth, pnum):
     bestMove = None
     bestMoveValue = sys.float_info.min
     for move in moveMap: #might be wrong

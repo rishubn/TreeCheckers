@@ -27,3 +27,11 @@ def testGeneratePriorityMap():
 	priorityMap = AI.generatePriorityMap(bm.players[0]["root"])
 	expected = {0: 0.0, 1: 0.3333333333333333, 2: 2.0, 3: 2.0, 4: 0.3333333333333333, 5: 2.0, 6: 2.0}
 	assert expected == priorityMap
+
+def testApplyMove():
+    depth = 2
+    children = 2
+    bm = BoardManager(1000,1000, {'startDepth':depth, 'numChildren':children})
+    expected = [bm.roots[0].children[1].x, bm.roots[0].children[1].y]
+    newBoardState = AI.applyMove(bm.roots, 1, [100,100])
+    assert expected != [newBoardState[0].children[1].x, newBoardState[0].children[1].y]
