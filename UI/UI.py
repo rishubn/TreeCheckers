@@ -64,7 +64,7 @@ class UI:
         c.td(width,colspan=3)
         #initialize height box
         c.tr()
-        c.td(gui.Label("Screen Width"))
+        c.td(gui.Label("Screen Height"))
         height = gui.Input(value='600',size=8)
         configs['height'] = 600
         def callback(e):
